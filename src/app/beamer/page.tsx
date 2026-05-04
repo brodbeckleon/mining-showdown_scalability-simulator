@@ -9,14 +9,7 @@ import { fmt, isStale } from "@/lib/colors";
 import { CONSTANTS } from "@/lib/simulation";
 import { classifyStrategy, STRATEGIES } from "@/lib/strategies";
 import type { GameRow, TeamRow } from "@/lib/types";
-
-const DEFAULT_GAME: GameRow = {
-  id: GAME_ID,
-  load: 300,
-  running: false,
-  started_at: null,
-  created_at: new Date().toISOString(),
-};
+import { DEFAULT_GAME } from "@/lib/defaults";
 
 export default function BeamerPage() {
   const [game, setGame] = useState<GameRow>(DEFAULT_GAME);

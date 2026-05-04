@@ -10,7 +10,7 @@ const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 if (!url || !key) {
   // Bewusst ein lauter Fehler, damit fehlende Env-Vars früh auffallen.
   // Wird nur clientseitig ausgeführt, wenn die Env-Datei nicht ausgeliefert wird.
-   
+
   console.warn(
     "Missing Supabase env vars. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in .env.local",
   );
