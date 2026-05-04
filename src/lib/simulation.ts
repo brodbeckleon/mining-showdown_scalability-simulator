@@ -17,7 +17,7 @@ export const CONSTANTS = {
   COST_LB: 12, // $/h für Load Balancer
   COST_SHARD: 9, // $/h pro Shard
   TEAM_BUDGET: 100, // Startkapital (Coins)
-  EARN_RATE: 0.001, // Coins pro erfolgreich verarbeitetem Request
+  EARN_RATE: 0.004, // Coins pro erfolgreich verarbeitetem Request
   SPEND_RATE: 0.01, // Coins pro $/h Infrastruktur pro Sekunde
 } as const;
 
