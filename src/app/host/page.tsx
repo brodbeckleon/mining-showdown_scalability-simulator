@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   Pause,
@@ -11,6 +11,7 @@ import {
   WifiOff,
   ArrowLeft,
   Trash2,
+  Lock,
 } from "lucide-react";
 import { Slider } from "@/components/Slider";
 import { supabase, GAME_ID } from "@/lib/supabase";
@@ -18,7 +19,32 @@ import { fmt, isStale } from "@/lib/colors";
 import type { GameRow, TeamRow } from "@/lib/types";
 import { DEFAULT_GAME } from "@/lib/defaults";
 
+const HOST_PASSWORD = process.env.NEXT_PUBLIC_HOST_PASSWORD ?? "host";
+const SESSION_KEY = "host_authed";
+
 export default function HostPage() {
+  const [authed, setAuthed] = useState(false);
+  const [pwInput, setPwInput] = useState("");
+  const [pwError, setPwError] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Restore session across reloads
+  useEffect(() => {
+    if (sessionStorage.getItem(SESSION_KEY) === "1") setAuthed(true);
+    else inputRef.current?.focus();
+  }, []);
+
+  const submitPassword = () => {
+    if (pwInput === HOST_PASSWORD) {
+      sessionStorage.setItem(SESSION_KEY, "1");
+      setAuthed(true);
+    } else {
+      setPwError(true);
+      setPwInput("");
+      setTimeout(() => setPwError(false), 1500);
+    }
+  };
+
   const [game, setGame] = useState<GameRow>(DEFAULT_GAME);
   const [teams, setTeams] = useState<TeamRow[]>([]);
 
@@ -103,7 +129,7 @@ export default function HostPage() {
       await sb.from("teams").delete().eq("game_id", GAME_ID);
       await sb
         .from("games")
-        .update({ load: 300, running: false, started_at: null })
+        .update({ load: 200, running: false, started_at: null })
         .eq("id", GAME_ID);
     }
     setGame({ ...DEFAULT_GAME, running: false, started_at: null });
@@ -118,6 +144,49 @@ export default function HostPage() {
   const sortedTeams = [...teams].sort(
     (a, b) => (b.score ?? 0) - (a.score ?? 0),
   );
+
+  if (!authed) {
+    return (
+      <main className="min-h-screen flex items-center justify-center p-6">
+        <div className="w-full max-w-xs">
+          <div className="flex items-center gap-2 mb-6">
+            <Lock size={16} className="text-amber-400" />
+            <span className="text-[11px] uppercase tracking-[0.3em] text-amber-400 font-jb">
+              Host Console
+            </span>
+          </div>
+          <h1 className="text-xl font-semibold mb-1">Zugang gesperrt</h1>
+          <p className="text-xs text-zinc-500 font-jb mb-6">
+            Passwort eingeben um fortzufahren.
+          </p>
+          <input
+            ref={inputRef}
+            type="password"
+            value={pwInput}
+            onChange={(e) => setPwInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && submitPassword()}
+            placeholder="Passwort"
+            className={`w-full bg-zinc-900 border outline-none px-3 py-2.5 text-sm font-jb mb-3 transition-colors ${
+              pwError
+                ? "border-red-500 text-red-400"
+                : "border-zinc-700 focus:border-amber-500"
+            }`}
+          />
+          {pwError && (
+            <p className="text-xs text-red-400 font-jb mb-3">
+              Falsches Passwort.
+            </p>
+          )}
+          <button
+            onClick={submitPassword}
+            className="w-full bg-amber-500 text-zinc-950 font-medium py-2.5 hover:bg-amber-400 transition-colors font-jb text-sm"
+          >
+            Einloggen
+          </button>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen p-5">
