@@ -1,0 +1,52 @@
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --font-sora: "Sora", system-ui, -apple-system, sans-serif;
+  --font-jb: "JetBrains Mono", ui-monospace, "Cascadia Code", monospace;
+}
+
+html,
+body {
+  background: #09090b;
+  color: #e4e4e7;
+  font-family: var(--font-sora);
+}
+
+.font-jb {
+  font-family: var(--font-jb);
+}
+
+.font-sora {
+  font-family: var(--font-sora);
+}
+
+/* Range-slider thumb (browser-übergreifend) */
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #10b981;
+  border: 2px solid #0a0a0a;
+  cursor: pointer;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: #10b981;
+  border: 2px solid #0a0a0a;
+  cursor: pointer;
+  border-radius: 0;
+}
+input[type="range"]:disabled::-webkit-slider-thumb {
+  background: #52525b;
+}
+
+/* iOS-Safari: verhindert Slider-Zoom */
+input {
+  font-size: 16px;
+}
