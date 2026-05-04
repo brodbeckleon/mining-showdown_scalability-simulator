@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { LangProvider } from "@/lib/lang-context";
+import { LangToggle } from "@/components/LangToggle";
 
 export const metadata: Metadata = {
   title: "Mining Showdown — ASE2 Scalability Lab",
@@ -15,7 +17,10 @@ export default function RootLayout({
   return (
     <html lang="de">
       <body className="font-sora bg-zinc-950 text-zinc-200 antialiased">
-        {children}
+        <LangProvider>
+          {children}
+          <LangToggle />
+        </LangProvider>
       </body>
     </html>
   );

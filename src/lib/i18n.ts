@@ -1,0 +1,218 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Translations — DE / EN
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type Lang = "de" | "en";
+
+export const translations = {
+  de: {
+    common: {
+      back: "← zurück",
+      leave: "verlassen",
+    },
+    home: {
+      tagline: "ASE2 — Scalability Multiplayer",
+      subtitle:
+        "Wer baut die effizienteste Mining-Infrastruktur unter Last? Jedes Team startet mit dem gleichen Wallet. Wer am klügsten skaliert — vertikal, horizontal oder mit Sharding — gewinnt.",
+      beamerDesc: "Leaderboard für die Projektion. Live-Ranking aller Teams.",
+      teamTitle: "Team beitreten",
+      teamDesc:
+        "Mitspielen vom Laptop oder Handy. Topologie, Sliders, Live-Score.",
+      hostDesc: "Spielleitung. Last steuern, Spiel starten oder zurücksetzen.",
+      howToPlay: "Spielablauf",
+      step1: "Host öffnet die Beamer-Ansicht und projiziert sie.",
+      step2:
+        "Teams öffnen die Team-Ansicht auf ihren Geräten und treten mit Namen bei.",
+      step3: "Host startet das Spiel und passt die Last über die Zeit an.",
+      step4: (budget: number) =>
+        `Teams starten mit ${budget} Coins Wallet. Infrastrukturkosten laufen laufend ab — wer bankrott geht, ist raus.`,
+      step5:
+        "Score = kumulierte erfolgreich verarbeitete Anfragen. Drops = weniger Einnahmen.",
+    },
+    beamer: {
+      live: "LIVE — MINING IN PROGRESS",
+      waiting: "WAITING TO START",
+      globalLoad: "Globale Last",
+      startWallet: "Start-Wallet",
+      strategies: "Strategien",
+      waitingTeams: "Warte auf Teams...",
+      waitingHint: "/team öffnen, Namen eingeben.",
+      currentLeader: "aktueller Leader",
+      liveStatus: "live",
+      pausedStatus: "pausiert",
+      scoreFooter: "score = kumulierte erfolgreich verarbeitete requests",
+      labFooter: "ASE2 Scalability Lab",
+      teams: (n: number) => `${n} team${n !== 1 ? "s" : ""}`,
+    },
+    host: {
+      locked: "Zugang gesperrt",
+      lockedHint: "Passwort eingeben um fortzufahren.",
+      password: "Passwort",
+      wrongPassword: "Falsches Passwort.",
+      login: "Einloggen",
+      gameControl: "Spielleitung",
+      connected: (n: number) => `${n} Team${n !== 1 ? "s" : ""} verbunden`,
+      running: "läuft",
+      paused: "pausiert",
+      gameStatus: "Spielstatus",
+      globalLoad: "Globale Last (alle Teams)",
+      loadHint:
+        "Ändere die Last während des Spiels — Teams müssen darauf reagieren.",
+      connectedTeams: "Verbundene Teams",
+      noTeams: "Noch niemand beigetreten. Teile den Link zur /team-Seite.",
+      deleteTeamTitle: "Team löschen",
+      confirmReset: "Alle Teams und Spielstand löschen?",
+      confirmDeleteTeam: (name: string) => `Team "${name}" löschen?`,
+    },
+    team: {
+      joinTitle: "Team beitreten",
+      joinSubtitle: "Wähle einen Namen — er erscheint auf dem Beamer.",
+      teamName: "Team-Name",
+      namePlaceholder: "z.B. Hash Rangers",
+      colorHint: "Farbe wird automatisch zugewiesen",
+      joinButton: "Spiel beitreten →",
+      walletHint: (budget: number) =>
+        `Startet bei ${budget} Coins. Jeder verarbeitete Request bringt Einnahmen, Infrastruktur kostet laufend. Wallet ≤ 0 = Game Over.`,
+      errorFallback: "Unbekannter Fehler",
+      errorCreate: "Konnte Team nicht erstellen",
+      waitingHost: "warten auf Host",
+      load: "Last",
+      rank: "Rang",
+      verticalSection: "Vertical (pro Node)",
+      cpuCores: "CPU-Kerne",
+      horizontal: "Horizontal",
+      nodeCount: "Anzahl Nodes",
+      lbHint: "Ohne LB arbeitet nur Node 1.",
+      sharding: "Sharding",
+      dbShards: "DB-Shards",
+      topology: "Topologie",
+      utilization: "Auslastung",
+      responseTime: "Antwortzeit",
+      appCap: "App-Cap",
+      noTeamsYet: "Noch keine Teams aktiv.",
+      statusBankrupt: "BANKRUPT — Infrastruktur offline. Endstand eingefroren.",
+      statusNotStarted:
+        "Spiel noch nicht gestartet — du kannst aber schon planen.",
+      statusDraining: (rate: string) =>
+        `Wallet schrumpft (${rate}/s) — Infrastruktur zu teuer für aktuellen Durchsatz.`,
+      statusBottleneck: (n: number) => `Engpass: ${n} req/s gehen verloren.`,
+      statusOk: "System läuft sauber. Mining aktiv.",
+      infraOffline: "Infrastruktur offline",
+      finalScore: "Endstand",
+      throughput: "Throughput",
+    },
+    strategyPanel: {
+      title: "Skalierungsstrategien",
+      subtitle: "aus Bondi & Software Engineering at Google",
+      liveClassified: (n: number) =>
+        `live klassifiziert · ${n} Team${n !== 1 ? "s" : ""}`,
+      more: (n: number) => `+ ${n} mehr`,
+      footer:
+        "Klassifikation per Heuristik auf Team-Konfiguration. Sharding hat Vorrang vor Combined, Combined vor Load-Balanced, Misconfig (Nodes ohne LB) wird als eigene Kategorie geführt — weil das laut Bondi genau das Beispiel für schlechte structural scalability ist.",
+    },
+  },
+  en: {
+    common: {
+      back: "← back",
+      leave: "leave",
+    },
+    home: {
+      tagline: "ASE2 — Scalability Multiplayer",
+      subtitle:
+        "Who builds the most efficient mining infrastructure under load? Every team starts with the same wallet. Who scales smartest — vertically, horizontally, or with sharding — wins.",
+      beamerDesc: "Leaderboard for projection. Live ranking of all teams.",
+      teamTitle: "Join Team",
+      teamDesc: "Play from laptop or phone. Topology, sliders, live score.",
+      hostDesc: "Game control. Manage load, start or reset the game.",
+      howToPlay: "How to Play",
+      step1: "Host opens the Beamer view and projects it.",
+      step2: "Teams open the Team view on their devices and join with a name.",
+      step3: "Host starts the game and adjusts the load over time.",
+      step4: (budget: number) =>
+        `Teams start with a ${budget} Coin wallet. Infrastructure costs drain it continuously — go bankrupt and you're out.`,
+      step5:
+        "Score = cumulative successfully processed requests. Drops = less earnings.",
+    },
+    beamer: {
+      live: "LIVE — MINING IN PROGRESS",
+      waiting: "WAITING TO START",
+      globalLoad: "Global Load",
+      startWallet: "Start Wallet",
+      strategies: "Strategies",
+      waitingTeams: "Waiting for teams...",
+      waitingHint: "Open /team, enter a name.",
+      currentLeader: "current leader",
+      liveStatus: "live",
+      pausedStatus: "paused",
+      scoreFooter: "score = cumulative successfully processed requests",
+      labFooter: "ASE2 Scalability Lab",
+      teams: (n: number) => `${n} team${n !== 1 ? "s" : ""}`,
+    },
+    host: {
+      locked: "Access Restricted",
+      lockedHint: "Enter password to continue.",
+      password: "Password",
+      wrongPassword: "Wrong password.",
+      login: "Login",
+      gameControl: "Game Control",
+      connected: (n: number) => `${n} team${n !== 1 ? "s" : ""} connected`,
+      running: "running",
+      paused: "paused",
+      gameStatus: "Game Status",
+      globalLoad: "Global Load (all teams)",
+      loadHint: "Change the load during the game — teams must adapt.",
+      connectedTeams: "Connected Teams",
+      noTeams: "Nobody joined yet. Share the /team link.",
+      deleteTeamTitle: "Delete team",
+      confirmReset: "Delete all teams and game state?",
+      confirmDeleteTeam: (name: string) => `Delete team "${name}"?`,
+    },
+    team: {
+      joinTitle: "Join Team",
+      joinSubtitle: "Choose a name — it appears on the beamer.",
+      teamName: "Team Name",
+      namePlaceholder: "e.g. Hash Rangers",
+      colorHint: "Color is assigned automatically",
+      joinButton: "Join game →",
+      walletHint: (budget: number) =>
+        `Starts at ${budget} Coins. Every processed request earns income, infrastructure costs run continuously. Wallet ≤ 0 = Game Over.`,
+      errorFallback: "Unknown error",
+      errorCreate: "Could not create team",
+      waitingHost: "waiting for host",
+      load: "Load",
+      rank: "Rank",
+      verticalSection: "Vertical (per Node)",
+      cpuCores: "CPU Cores",
+      horizontal: "Horizontal",
+      nodeCount: "Node Count",
+      lbHint: "Without LB only Node 1 is active.",
+      sharding: "Sharding",
+      dbShards: "DB Shards",
+      topology: "Topology",
+      utilization: "Utilization",
+      responseTime: "Response Time",
+      appCap: "App Cap",
+      noTeamsYet: "No teams active yet.",
+      statusBankrupt: "BANKRUPT — Infrastructure offline. Final score frozen.",
+      statusNotStarted: "Game not started yet — you can plan ahead.",
+      statusDraining: (rate: string) =>
+        `Wallet draining (${rate}/s) — infrastructure too expensive for current throughput.`,
+      statusBottleneck: (n: number) => `Bottleneck: ${n} req/s being dropped.`,
+      statusOk: "System running clean. Mining active.",
+      infraOffline: "Infrastructure offline",
+      finalScore: "Final Score",
+      throughput: "Throughput",
+    },
+    strategyPanel: {
+      title: "Scaling Strategies",
+      subtitle: "from Bondi & Software Engineering at Google",
+      liveClassified: (n: number) =>
+        `live classified · ${n} team${n !== 1 ? "s" : ""}`,
+      more: (n: number) => `+ ${n} more`,
+      footer:
+        "Classification by heuristic on team configuration. Sharding takes precedence over Combined, Combined over Load-Balanced, Misconfig (nodes without LB) is its own category — because that is exactly Bondi's example of poor structural scalability.",
+    },
+  },
+};
+
+export type Translations = typeof translations.de;

@@ -1,30 +1,31 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Skalierungsstrategien aus der ASE2-Arbeit
 // ─────────────────────────────────────────────────────────────────────────────
-// Diese sechs Strategien spiegeln Bondis Unterscheidung von load- und
-// structural scalability sowie die Eingrenzung des praktischen Teils:
-// Vertical Scaling, Load Balancing, deren Kombination, plus Sharding als
-// Erweiterung für datenintensive Systeme.
 
 import type { TeamConfig, StrategyKey } from "./types";
 
+type BiStr = { de: string; en: string };
+
 export type Strategy = {
   key: StrategyKey;
-  label: string;
+  label: BiStr;
   short: string;
-  desc: string;
+  desc: BiStr;
   cfg: TeamConfig;
-  pros: string;
-  cons: string;
+  pros: BiStr;
+  cons: BiStr;
   color: string;
 };
 
 export const STRATEGIES: Record<StrategyKey, Strategy> = {
   baseline: {
     key: "baseline",
-    label: "Ausgangszustand",
+    label: { de: "Ausgangszustand", en: "Baseline" },
     short: "Baseline",
-    desc: "Eine Node, minimale Ressourcen — günstig, aber sofort Engpass bei steigender Last.",
+    desc: {
+      de: "Eine Node, minimale Ressourcen — günstig, aber sofort Engpass bei steigender Last.",
+      en: "One node, minimal resources — cheap, but immediately bottlenecked under rising load.",
+    },
     cfg: {
       cpuPerNode: 2,
       ramPerNode: 4,
@@ -32,15 +33,18 @@ export const STRATEGIES: Record<StrategyKey, Strategy> = {
       loadBalancer: false,
       shards: 1,
     },
-    pros: "Billig, einfach.",
-    cons: "Kein Wachstumspfad.",
+    pros: { de: "Billig, einfach.", en: "Cheap, simple." },
+    cons: { de: "Kein Wachstumspfad.", en: "No growth path." },
     color: "#71717a",
   },
   vertical: {
     key: "vertical",
-    label: "Vertical Scaling",
+    label: { de: "Vertical Scaling", en: "Vertical Scaling" },
     short: "Vertical",
-    desc: "Eine Node, aber mehr CPU & RAM. Hilft bis zur Hardware-Grenze.",
+    desc: {
+      de: "Eine Node, aber mehr CPU & RAM. Hilft bis zur Hardware-Grenze.",
+      en: "One node, but more CPU & RAM. Helps up to the hardware limit.",
+    },
     cfg: {
       cpuPerNode: 12,
       ramPerNode: 24,
@@ -48,15 +52,24 @@ export const STRATEGIES: Record<StrategyKey, Strategy> = {
       loadBalancer: false,
       shards: 1,
     },
-    pros: "Schnell zu implementieren, keine Architekturänderung.",
-    cons: "Single Point of Failure, irgendwann Hardware-Limit.",
+    pros: {
+      de: "Schnell zu implementieren, keine Architekturänderung.",
+      en: "Fast to implement, no architectural change.",
+    },
+    cons: {
+      de: "Single Point of Failure, irgendwann Hardware-Limit.",
+      en: "Single point of failure, eventual hardware limit.",
+    },
     color: "#06b6d4",
   },
   noLB: {
     key: "noLB",
-    label: "Mehr Nodes ohne LB",
+    label: { de: "Mehr Nodes ohne LB", en: "More Nodes, No LB" },
     short: "Misconfig",
-    desc: "Klassischer Fehler: Nodes da, aber kein Load Balancer — die erste ackert, der Rest steht.",
+    desc: {
+      de: "Klassischer Fehler: Nodes da, aber kein Load Balancer — die erste ackert, der Rest steht.",
+      en: "Classic mistake: nodes exist but no load balancer — the first one works, the rest idle.",
+    },
     cfg: {
       cpuPerNode: 4,
       ramPerNode: 8,
@@ -64,15 +77,21 @@ export const STRATEGIES: Record<StrategyKey, Strategy> = {
       loadBalancer: false,
       shards: 1,
     },
-    pros: "—",
-    cons: "Geld verbrannt, Engpass bleibt.",
+    pros: { de: "—", en: "—" },
+    cons: {
+      de: "Geld verbrannt, Engpass bleibt.",
+      en: "Money wasted, bottleneck remains.",
+    },
     color: "#ef4444",
   },
   loadBalanced: {
     key: "loadBalanced",
-    label: "Load Balancing",
+    label: { de: "Load Balancing", en: "Load Balancing" },
     short: "Load-Balanced",
-    desc: "Mehrere Nodes hinter einem Load Balancer. Last gleichmässig verteilt.",
+    desc: {
+      de: "Mehrere Nodes hinter einem Load Balancer. Last gleichmässig verteilt.",
+      en: "Multiple nodes behind a load balancer. Load evenly distributed.",
+    },
     cfg: {
       cpuPerNode: 4,
       ramPerNode: 8,
@@ -80,15 +99,24 @@ export const STRATEGIES: Record<StrategyKey, Strategy> = {
       loadBalancer: true,
       shards: 1,
     },
-    pros: "Horizontal skalierbar, Ausfallsicherheit.",
-    cons: "Datenbank kann zum neuen Engpass werden.",
+    pros: {
+      de: "Horizontal skalierbar, Ausfallsicherheit.",
+      en: "Horizontally scalable, fault tolerance.",
+    },
+    cons: {
+      de: "Datenbank kann zum neuen Engpass werden.",
+      en: "Database can become the new bottleneck.",
+    },
     color: "#10b981",
   },
   combined: {
     key: "combined",
-    label: "Kombiniert",
+    label: { de: "Kombiniert", en: "Combined" },
     short: "Combined",
-    desc: "Vertical + Horizontal. Solides App-Tier — aber DB ist noch nicht entlastet.",
+    desc: {
+      de: "Vertical + Horizontal. Solides App-Tier — aber DB ist noch nicht entlastet.",
+      en: "Vertical + Horizontal. Solid app tier — but DB is not yet relieved.",
+    },
     cfg: {
       cpuPerNode: 8,
       ramPerNode: 16,
@@ -96,15 +124,21 @@ export const STRATEGIES: Record<StrategyKey, Strategy> = {
       loadBalancer: true,
       shards: 1,
     },
-    pros: "Hohe App-Kapazität.",
-    cons: "Teuer; bei datenintensiver Last nicht ausreichend.",
+    pros: { de: "Hohe App-Kapazität.", en: "High app capacity." },
+    cons: {
+      de: "Teuer; bei datenintensiver Last nicht ausreichend.",
+      en: "Expensive; insufficient for data-intensive load.",
+    },
     color: "#8b5cf6",
   },
   sharded: {
     key: "sharded",
-    label: "Mit Sharding",
+    label: { de: "Mit Sharding", en: "With Sharding" },
     short: "Sharded",
-    desc: "Erweiterung: DB-Last über mehrere Shards verteilt — entlastet das Data-Tier.",
+    desc: {
+      de: "Erweiterung: DB-Last über mehrere Shards verteilt — entlastet das Data-Tier.",
+      en: "Extension: DB load distributed across multiple shards — relieves the data tier.",
+    },
     cfg: {
       cpuPerNode: 6,
       ramPerNode: 12,
@@ -112,8 +146,14 @@ export const STRATEGIES: Record<StrategyKey, Strategy> = {
       loadBalancer: true,
       shards: 4,
     },
-    pros: "Skaliert auch bei datenintensiven Systemen.",
-    cons: "Komplexere Konsistenz, höherer Wartungsaufwand.",
+    pros: {
+      de: "Skaliert auch bei datenintensiven Systemen.",
+      en: "Scales even for data-intensive systems.",
+    },
+    cons: {
+      de: "Komplexere Konsistenz, höherer Wartungsaufwand.",
+      en: "More complex consistency, higher maintenance overhead.",
+    },
     color: "#f59e0b",
   },
 };
@@ -129,8 +169,6 @@ export const STRATEGY_ORDER: StrategyKey[] = [
 
 /**
  * Klassifiziert eine Team-Konfiguration in eine der sechs Strategien.
- * Reihenfolge bewusst: speziellere Strategien (Sharding, Misconfig) vor
- * generelleren (Vertical, Baseline).
  */
 export function classifyStrategy(cfg: TeamConfig): StrategyKey {
   if (cfg.shards > 1) return "sharded";

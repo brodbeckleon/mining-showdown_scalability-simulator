@@ -24,8 +24,10 @@ import { supabase, GAME_ID } from "@/lib/supabase";
 import { colorForName, fmt } from "@/lib/colors";
 import type { TeamConfig, GameRow, TeamRow } from "@/lib/types";
 import { DEFAULT_CFG, DEFAULT_GAME } from "@/lib/defaults";
+import { useLang } from "@/lib/lang-context";
 
 export default function TeamPage() {
+  const { t } = useLang();
   const [stage, setStage] = useState<"register" | "playing">("register");
   const [teamName, setTeamName] = useState("");
   const [teamId, setTeamId] = useState<string | null>(null);
@@ -43,7 +45,6 @@ export default function TeamPage() {
   const cfgRef = useRef(cfg);
   const teamIdRef = useRef<string | null>(null);
 
-  // Refs synchron halten
   useEffect(() => {
     cfgRef.current = cfg;
   }, [cfg]);
@@ -82,7 +83,7 @@ export default function TeamPage() {
         .single();
 
       if (insertError || !data) {
-        setError(insertError?.message ?? "Konnte Team nicht erstellen");
+        setError(insertError?.message ?? t.team.errorCreate);
         return;
       }
 
@@ -95,9 +96,9 @@ export default function TeamPage() {
       lastTickRef.current = Date.now();
       setStage("playing");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Unbekannter Fehler");
+      setError(e instanceof Error ? e.message : t.team.errorFallback);
     }
-  }, [teamName]);
+  }, [teamName, t]);
 
   // ─── Spielzustand laden + abonnieren ──────────────────────────────────────
   useEffect(() => {
@@ -142,7 +143,6 @@ export default function TeamPage() {
           filter: `game_id=eq.${GAME_ID}`,
         },
         () => {
-          // Bei jeder Änderung: alle Teams neu laden (für Mini-Leaderboard)
           sb.from("teams")
             .select("*")
             .eq("game_id", GAME_ID)
@@ -212,7 +212,6 @@ export default function TeamPage() {
     const handleBeforeUnload = () => {
       const id = teamIdRef.current;
       if (!id) return;
-      // Best-effort delete (sendBeacon wäre robuster, aber Supabase REST braucht Auth-Header)
       supabase().from("teams").delete().eq("id", id);
     };
     window.addEventListener("beforeunload", handleBeforeUnload);
@@ -228,11 +227,11 @@ export default function TeamPage() {
             href="/"
             className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 font-jb mb-6"
           >
-            <ArrowLeft size={12} /> zurück
+            <ArrowLeft size={12} /> {t.common.back}
           </Link>
-          <h1 className="text-2xl font-semibold mb-1">Team beitreten</h1>
+          <h1 className="text-2xl font-semibold mb-1">{t.team.joinTitle}</h1>
           <p className="text-sm text-zinc-500 mb-8 font-jb">
-            Wähle einen Namen — er erscheint auf dem Beamer.
+            {t.team.joinSubtitle}
           </p>
 
           <div className="space-y-4">
@@ -241,7 +240,7 @@ export default function TeamPage() {
                 htmlFor="team-name"
                 className="text-[11px] uppercase tracking-wider text-zinc-400 font-jb"
               >
-                Team-Name
+                {t.team.teamName}
               </label>
               <input
                 id="team-name"
@@ -249,7 +248,7 @@ export default function TeamPage() {
                 value={teamName}
                 onChange={(e) => setTeamName(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && register()}
-                placeholder="z.B. Hash Rangers"
+                placeholder={t.team.namePlaceholder}
                 maxLength={24}
                 autoFocus
                 className="w-full mt-1.5 bg-zinc-900 border border-zinc-700 focus:border-emerald-500 outline-none px-3 py-2.5 text-sm font-jb"
@@ -260,9 +259,7 @@ export default function TeamPage() {
                     className="w-3 h-3"
                     style={{ background: colorForName(teamName.trim()) }}
                   />
-                  <span className="text-zinc-500">
-                    Farbe wird automatisch zugewiesen
-                  </span>
+                  <span className="text-zinc-500">{t.team.colorHint}</span>
                 </div>
               )}
             </div>
@@ -278,13 +275,12 @@ export default function TeamPage() {
               disabled={!teamName.trim()}
               className="w-full bg-emerald-500 disabled:bg-zinc-800 disabled:text-zinc-600 text-zinc-950 font-medium py-2.5 hover:bg-emerald-400 transition-colors font-jb text-sm"
             >
-              Spiel beitreten →
+              {t.team.joinButton}
             </button>
 
             <div className="border border-zinc-800 bg-zinc-900/30 p-3 text-xs text-zinc-400 font-jb leading-relaxed">
-              <span className="text-emerald-400">Wallet:</span> Startet bei{" "}
-              {CONSTANTS.TEAM_BUDGET} Coins. Jeder verarbeitete Request bringt
-              Einnahmen, Infrastruktur kostet laufend. Wallet ≤ 0 = Game Over.
+              <span className="text-emerald-400">Wallet:</span>{" "}
+              {t.team.walletHint(CONSTANTS.TEAM_BUDGET)}
             </div>
           </div>
         </div>
@@ -298,7 +294,10 @@ export default function TeamPage() {
   const sortedTeams = [...allTeams].sort(
     (a, b) => (b.score ?? 0) - (a.score ?? 0),
   );
-  const myRank = sortedTeams.findIndex((t) => t.id === teamId) + 1;
+  const myRank = sortedTeams.findIndex((tm) => tm.id === teamId) + 1;
+
+  // suppress unused warning
+  void deployed;
 
   const statusClass = bankrupt
     ? "border-red-500/40 bg-red-500/10 text-red-400"
@@ -311,14 +310,14 @@ export default function TeamPage() {
           : "border-emerald-500/40 bg-emerald-500/10 text-emerald-400";
 
   const statusText = bankrupt
-    ? "BANKRUPT — Infrastruktur offline. Endstand eingefroren."
+    ? t.team.statusBankrupt
     : !game.running
-      ? "Spiel noch nicht gestartet — du kannst aber schon planen."
+      ? t.team.statusNotStarted
       : earnRate < 0
-        ? `Wallet schrumpft (${earnRate.toFixed(3)}/s) — Infrastruktur zu teuer für aktuellen Durchsatz.`
+        ? t.team.statusDraining(earnRate.toFixed(3))
         : metrics.dropped > 1
-          ? `Engpass: ${Math.round(metrics.dropped)} req/s gehen verloren.`
-          : "System läuft sauber. Mining aktiv.";
+          ? t.team.statusBottleneck(Math.round(metrics.dropped))
+          : t.team.statusOk;
 
   return (
     <main className="min-h-screen p-3 md:p-5">
@@ -333,9 +332,9 @@ export default function TeamPage() {
                 {game.running ? (
                   <span className="text-emerald-400">● live</span>
                 ) : (
-                  <span className="text-zinc-600">○ warten auf Host</span>
+                  <span className="text-zinc-600">○ {t.team.waitingHost}</span>
                 )}{" "}
-                · Last: {game.load} req/s
+                · {t.team.load}: {game.load} req/s
               </div>
             </div>
           </div>
@@ -343,7 +342,7 @@ export default function TeamPage() {
             href="/"
             className="text-xs text-zinc-500 hover:text-zinc-300 font-jb"
           >
-            verlassen
+            {t.common.leave}
           </Link>
         </header>
 
@@ -355,7 +354,7 @@ export default function TeamPage() {
           <span className="flex-1">{statusText}</span>
           {myRank > 0 && (
             <span className="text-zinc-500">
-              Rang #{myRank}/{allTeams.length}
+              {t.team.rank} #{myRank}/{allTeams.length}
             </span>
           )}
         </div>
@@ -402,11 +401,11 @@ export default function TeamPage() {
               <div className="flex items-center gap-2">
                 <TrendingUp size={13} className="text-zinc-400" />
                 <h2 className="text-[11px] uppercase tracking-widest text-zinc-400 font-jb">
-                  Vertical (pro Node)
+                  {t.team.verticalSection}
                 </h2>
               </div>
               <Slider
-                label="CPU-Kerne"
+                label={t.team.cpuCores}
                 value={cfg.cpuPerNode}
                 min={1}
                 max={16}
@@ -427,11 +426,11 @@ export default function TeamPage() {
               <div className="flex items-center gap-2">
                 <Network size={13} className="text-zinc-400" />
                 <h2 className="text-[11px] uppercase tracking-widest text-zinc-400 font-jb">
-                  Horizontal
+                  {t.team.horizontal}
                 </h2>
               </div>
               <Slider
-                label="Anzahl Nodes"
+                label={t.team.nodeCount}
                 value={cfg.nodeCount}
                 min={1}
                 max={6}
@@ -442,7 +441,7 @@ export default function TeamPage() {
                 label="Load Balancer"
                 value={cfg.loadBalancer}
                 onChange={(v) => update({ loadBalancer: v })}
-                hint="Ohne LB arbeitet nur Node 1."
+                hint={t.team.lbHint}
               />
             </section>
 
@@ -450,11 +449,11 @@ export default function TeamPage() {
               <div className="flex items-center gap-2">
                 <Database size={13} className="text-zinc-400" />
                 <h2 className="text-[11px] uppercase tracking-widest text-zinc-400 font-jb">
-                  Sharding
+                  {t.team.sharding}
                 </h2>
               </div>
               <Slider
-                label="DB-Shards"
+                label={t.team.dbShards}
                 value={cfg.shards}
                 min={1}
                 max={6}
@@ -471,7 +470,7 @@ export default function TeamPage() {
                 <div className="flex items-center gap-2">
                   <Server size={13} className="text-zinc-400" />
                   <h2 className="text-[11px] uppercase tracking-widest text-zinc-400 font-jb">
-                    Topologie
+                    {t.team.topology}
                   </h2>
                 </div>
                 <div className="flex items-center gap-3 text-[9px] font-jb text-zinc-500">
@@ -502,10 +501,10 @@ export default function TeamPage() {
                   BANKRUPT
                 </div>
                 <div className="text-xl font-jb text-red-300">
-                  Infrastruktur offline
+                  {t.team.infraOffline}
                 </div>
                 <div className="text-xs text-zinc-500 font-jb mt-2">
-                  Endstand:{" "}
+                  {t.team.finalScore}:{" "}
                   <span className="text-zinc-300 tabular-nums">
                     {fmt(score)}
                   </span>
@@ -523,7 +522,7 @@ export default function TeamPage() {
                   {fmt(score)}
                 </div>
                 <div className="text-xs text-zinc-500 font-jb mt-1">
-                  Throughput:{" "}
+                  {t.team.throughput}:{" "}
                   <span className="text-zinc-300">
                     {Math.round(metrics.throughput)}
                   </span>{" "}
@@ -542,7 +541,7 @@ export default function TeamPage() {
           <div className="lg:col-span-3 space-y-3">
             <section className="border border-zinc-800 bg-zinc-900/30 p-4 space-y-3">
               <h3 className="text-[11px] uppercase tracking-widest text-zinc-400 font-jb">
-                Auslastung
+                {t.team.utilization}
               </h3>
               <div className="space-y-1">
                 <div className="flex justify-between text-xs font-jb">
@@ -583,7 +582,7 @@ export default function TeamPage() {
               <div className="pt-2 border-t border-zinc-800 grid grid-cols-2 gap-2 text-xs font-jb">
                 <div>
                   <div className="text-zinc-500 text-[10px] uppercase tracking-wider">
-                    Antwortzeit
+                    {t.team.responseTime}
                   </div>
                   <div className="tabular-nums text-zinc-200">
                     {Math.round(metrics.responseTime)} ms
@@ -591,7 +590,7 @@ export default function TeamPage() {
                 </div>
                 <div>
                   <div className="text-zinc-500 text-[10px] uppercase tracking-wider">
-                    App-Cap
+                    {t.team.appCap}
                   </div>
                   <div className="tabular-nums text-zinc-200">
                     {Math.round(metrics.cpuCapacity)} req/s
@@ -608,24 +607,27 @@ export default function TeamPage() {
                 </h3>
               </div>
               <div className="space-y-1.5">
-                {sortedTeams.slice(0, 5).map((t, i) => (
+                {sortedTeams.slice(0, 5).map((tm, i) => (
                   <div
-                    key={t.id}
+                    key={tm.id}
                     className={`flex items-center gap-2 text-xs font-jb ${
-                      t.id === teamId ? "text-emerald-400" : "text-zinc-300"
+                      tm.id === teamId ? "text-emerald-400" : "text-zinc-300"
                     }`}
                   >
                     <span className="w-4 text-zinc-500 tabular-nums">
                       #{i + 1}
                     </span>
-                    <span className="w-2 h-2" style={{ background: t.color }} />
-                    <span className="flex-1 truncate">{t.name}</span>
-                    <span className="tabular-nums">{fmt(t.score)}</span>
+                    <span
+                      className="w-2 h-2"
+                      style={{ background: tm.color }}
+                    />
+                    <span className="flex-1 truncate">{tm.name}</span>
+                    <span className="tabular-nums">{fmt(tm.score)}</span>
                   </div>
                 ))}
                 {sortedTeams.length === 0 && (
                   <div className="text-[11px] text-zinc-600 font-jb">
-                    Noch keine Teams aktiv.
+                    {t.team.noTeamsYet}
                   </div>
                 )}
               </div>

@@ -10,8 +10,10 @@ import { CONSTANTS } from "@/lib/simulation";
 import { classifyStrategy, STRATEGIES } from "@/lib/strategies";
 import type { GameRow, TeamRow } from "@/lib/types";
 import { DEFAULT_GAME } from "@/lib/defaults";
+import { useLang } from "@/lib/lang-context";
 
 export default function BeamerPage() {
+  const { lang, t } = useLang();
   const [game, setGame] = useState<GameRow>(DEFAULT_GAME);
   const [teams, setTeams] = useState<TeamRow[]>([]);
   const [showStrategies, setShowStrategies] = useState(false);
@@ -87,8 +89,11 @@ export default function BeamerPage() {
   }, [onKey]);
 
   const sorted = [...teams].sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
-  const maxScore = Math.max(1, ...sorted.map((t) => t.score ?? 0));
+  const maxScore = Math.max(1, ...sorted.map((tm) => tm.score ?? 0));
   const champion = sorted[0];
+
+  // suppress unused warning — lang is used implicitly via t
+  void lang;
 
   return (
     <main className="min-h-screen p-6 lg:p-10 relative">
@@ -96,7 +101,7 @@ export default function BeamerPage() {
         href="/"
         className="absolute top-3 right-3 text-[10px] text-zinc-700 hover:text-zinc-500 font-jb z-10"
       >
-        ← menu
+        {t.common.back}
       </Link>
 
       <div className="max-w-7xl mx-auto">
@@ -106,9 +111,7 @@ export default function BeamerPage() {
             <div className="flex items-center gap-2.5 mb-2">
               <div className="w-2.5 h-2.5 bg-emerald-500 animate-pulse-mine" />
               <span className="text-xs uppercase tracking-[0.4em] text-emerald-400 font-jb">
-                {game.running
-                  ? "LIVE — MINING IN PROGRESS"
-                  : "WAITING TO START"}
+                {game.running ? t.beamer.live : t.beamer.waiting}
               </span>
             </div>
             <h1 className="text-5xl lg:text-6xl font-bold tracking-tight">
@@ -118,13 +121,13 @@ export default function BeamerPage() {
           <div className="flex items-end gap-6">
             <div className="text-right">
               <div className="text-[11px] uppercase tracking-widest text-zinc-500 font-jb mb-1">
-                Globale Last
+                {t.beamer.globalLoad}
               </div>
               <div className="text-5xl font-jb tabular-nums text-amber-400">
                 {game.load}
               </div>
               <div className="text-xs text-zinc-500 font-jb">
-                req/s · Start-Wallet {CONSTANTS.TEAM_BUDGET} Coins
+                req/s · {t.beamer.startWallet} {CONSTANTS.TEAM_BUDGET} Coins
               </div>
             </div>
             <button
@@ -138,7 +141,7 @@ export default function BeamerPage() {
             >
               {showStrategies ? <EyeOff size={13} /> : <Eye size={13} />}
               <BookOpen size={13} />
-              <span>Strategien</span>
+              <span>{t.beamer.strategies}</span>
               <kbd className="ml-1 px-1.5 py-0.5 border border-zinc-700 text-[9px] text-zinc-500">
                 S
               </kbd>
@@ -154,10 +157,10 @@ export default function BeamerPage() {
               className="text-zinc-700 mx-auto mb-4 animate-pulse"
             />
             <div className="text-2xl text-zinc-600 font-jb">
-              Warte auf Teams...
+              {t.beamer.waitingTeams}
             </div>
             <div className="text-sm text-zinc-700 mt-2 font-jb">
-              /team öffnen, Namen eingeben.
+              {t.beamer.waitingHint}
             </div>
           </div>
         ) : (
@@ -175,7 +178,7 @@ export default function BeamerPage() {
                   className="absolute top-3 right-3 flex items-center gap-1.5 text-[10px] uppercase tracking-widest font-jb"
                   style={{ color: champion.color }}
                 >
-                  <Crown size={11} /> aktueller Leader ·{" "}
+                  <Crown size={11} /> {t.beamer.currentLeader} ·{" "}
                   {STRATEGIES[classifyStrategy(champion.cfg)].short}
                 </div>
                 <div className="flex items-center gap-6 flex-wrap">
@@ -212,15 +215,15 @@ export default function BeamerPage() {
 
             {/* ─── Ranking-Liste ───────────────────────────────────── */}
             <div className="space-y-2 mb-8">
-              {sorted.map((t, i) => {
-                const widthPct = ((t.score ?? 0) / maxScore) * 100;
-                const stale = isStale(t.last_seen);
-                const inTrouble = t.over_budget || (t.dropped ?? 0) > 5;
-                const strategy = STRATEGIES[classifyStrategy(t.cfg)];
+              {sorted.map((tm, i) => {
+                const widthPct = ((tm.score ?? 0) / maxScore) * 100;
+                const stale = isStale(tm.last_seen);
+                const inTrouble = tm.over_budget || (tm.dropped ?? 0) > 5;
+                const strategy = STRATEGIES[classifyStrategy(tm.cfg)];
 
                 return (
                   <div
-                    key={t.id}
+                    key={tm.id}
                     className={`relative border ${
                       i === 0 ? "border-zinc-700" : "border-zinc-800"
                     } bg-zinc-900/30 overflow-hidden ${stale ? "opacity-40" : ""}`}
@@ -229,24 +232,24 @@ export default function BeamerPage() {
                       className="absolute inset-y-0 left-0 transition-all duration-1000"
                       style={{
                         width: `${widthPct}%`,
-                        background: `${t.color}15`,
+                        background: `${tm.color}15`,
                       }}
                     />
                     <div className="relative flex items-center gap-4 px-5 py-4">
                       <div
                         className="text-3xl font-bold font-jb tabular-nums w-12"
-                        style={{ color: t.color }}
+                        style={{ color: tm.color }}
                       >
                         {i + 1}
                       </div>
                       <div
                         className="w-1 h-10"
-                        style={{ background: t.color }}
+                        style={{ background: tm.color }}
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-xl font-semibold truncate">
-                            {t.name}
+                            {tm.name}
                           </span>
                           {showStrategies && (
                             <span
@@ -262,53 +265,53 @@ export default function BeamerPage() {
                           {stale && (
                             <WifiOff size={13} className="text-zinc-600" />
                           )}
-                          {t.over_budget && (
+                          {tm.over_budget && (
                             <span className="text-[10px] uppercase tracking-widest text-red-400 font-jb">
                               BANKRUPT
                             </span>
                           )}
-                          {!t.over_budget && (t.dropped ?? 0) > 5 && (
+                          {!tm.over_budget && (tm.dropped ?? 0) > 5 && (
                             <span className="text-[10px] uppercase tracking-widest text-amber-400 font-jb">
                               DROPS
                             </span>
                           )}
                         </div>
                         <div className="flex items-center gap-4 text-[11px] text-zinc-500 font-jb mt-1 flex-wrap">
-                          <span>${(t.cost ?? 0).toFixed(0)}/h</span>
-                          <span>{t.cfg.nodeCount}× node</span>
+                          <span>${(tm.cost ?? 0).toFixed(0)}/h</span>
+                          <span>{tm.cfg.nodeCount}× node</span>
                           <span>
-                            {t.cfg.cpuPerNode}c · {t.cfg.ramPerNode}gb
+                            {tm.cfg.cpuPerNode}c · {tm.cfg.ramPerNode}gb
                           </span>
-                          {t.cfg.loadBalancer && (
+                          {tm.cfg.loadBalancer && (
                             <span className="text-emerald-400">+LB</span>
                           )}
-                          {t.cfg.shards > 1 && (
+                          {tm.cfg.shards > 1 && (
                             <span className="text-violet-400">
-                              {t.cfg.shards} shards
+                              {tm.cfg.shards} shards
                             </span>
                           )}
-                          <span>{Math.round(t.response_time ?? 0)} ms</span>
+                          <span>{Math.round(tm.response_time ?? 0)} ms</span>
                         </div>
                       </div>
                       <div className="text-right">
                         <div
                           className="text-3xl lg:text-4xl font-bold font-jb tabular-nums"
-                          style={{ color: inTrouble ? "#ef4444" : t.color }}
+                          style={{ color: inTrouble ? "#ef4444" : tm.color }}
                         >
-                          {fmt(t.score)}
+                          {fmt(tm.score)}
                         </div>
                         <div className="text-[10px] text-zinc-500 font-jb">
-                          {Math.round(t.throughput ?? 0)}/s
-                          {(t.dropped ?? 0) > 1 && (
+                          {Math.round(tm.throughput ?? 0)}/s
+                          {(tm.dropped ?? 0) > 1 && (
                             <span className="text-red-400 ml-1.5">
-                              −{Math.round(t.dropped)}
+                              −{Math.round(tm.dropped)}
                             </span>
                           )}
                         </div>
                         <div
-                          className={`text-[10px] font-jb tabular-nums ${(t.wallet ?? 100) < 20 ? "text-amber-400" : "text-zinc-600"}`}
+                          className={`text-[10px] font-jb tabular-nums ${(tm.wallet ?? 100) < 20 ? "text-amber-400" : "text-zinc-600"}`}
                         >
-                          {(t.wallet ?? 100).toFixed(0)} coins
+                          {(tm.wallet ?? 100).toFixed(0)} coins
                         </div>
                       </div>
                     </div>
@@ -325,12 +328,11 @@ export default function BeamerPage() {
         {/* ─── Footer ───────────────────────────────────────────────── */}
         <footer className="mt-10 flex items-center justify-between text-[10px] text-zinc-700 font-jb">
           <span>
-            ASE2 Scalability Lab · {sorted.length} team
-            {sorted.length !== 1 ? "s" : ""}
+            {t.beamer.labFooter} · {t.beamer.teams(sorted.length)}
           </span>
           <span>
-            {game.running ? "live" : "paused"} · score = kumulierte erfolgreich
-            verarbeitete requests
+            {game.running ? t.beamer.liveStatus : t.beamer.pausedStatus} ·{" "}
+            {t.beamer.scoreFooter}
           </span>
         </footer>
       </div>
