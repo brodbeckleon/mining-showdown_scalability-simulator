@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import type { Lang, Translations } from "./i18n";
 import { translations } from "./i18n";
 
@@ -19,8 +19,13 @@ function readStoredLang(): Lang {
 }
 
 export function LangProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLangState] = useState<Lang>(readStoredLang);
+  const [lang, setLangState] = useState<Lang>("de");
   const [mounted, setMounted] = useState<boolean>(false);
+
+  useEffect(() => {
+    setLangState(readStoredLang());
+    setMounted(true);
+  }, []);
 
   const setLang = (l: Lang) => {
     localStorage.setItem("lang", l);
