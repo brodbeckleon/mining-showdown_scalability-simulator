@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useSyncExternalStore } from "react";
 import Link from "next/link";
 import {
   Pause,
@@ -23,12 +23,31 @@ import { useLang } from "@/lib/lang-context";
 const HOST_PASSWORD = process.env.NEXT_PUBLIC_HOST_PASSWORD ?? "host";
 const SESSION_KEY = "host_authed";
 
+let authListeners: Array<() => void> = [];
+function subscribeAuth(cb: () => void) {
+  authListeners.push(cb);
+  return () => {
+    authListeners = authListeners.filter((l) => l !== cb);
+  };
+}
+function getAuthSnapshot() {
+  return sessionStorage.getItem(SESSION_KEY) === "1";
+}
+function getAuthServerSnapshot() {
+  return false;
+}
+function setAuthSession(value: boolean) {
+  if (value) sessionStorage.setItem(SESSION_KEY, "1");
+  else sessionStorage.removeItem(SESSION_KEY);
+  authListeners.forEach((l) => l());
+}
+
 export default function HostPage() {
   const { t } = useLang();
-  const [authed, setAuthed] = useState(
-    () =>
-      typeof window !== "undefined" &&
-      sessionStorage.getItem(SESSION_KEY) === "1",
+  const authed = useSyncExternalStore(
+    subscribeAuth,
+    getAuthSnapshot,
+    getAuthServerSnapshot,
   );
   const [pwInput, setPwInput] = useState("");
   const [pwError, setPwError] = useState(false);
@@ -41,8 +60,7 @@ export default function HostPage() {
 
   const submitPassword = () => {
     if (pwInput === HOST_PASSWORD) {
-      sessionStorage.setItem(SESSION_KEY, "1");
-      setAuthed(true);
+      setAuthSession(true);
     } else {
       setPwError(true);
       setPwInput("");

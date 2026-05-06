@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useSyncExternalStore } from "react";
 import type { Lang, Translations } from "./i18n";
 import { translations } from "./i18n";
 
@@ -12,36 +12,36 @@ const LangContext = createContext<LangCtx>({
   t: translations.de,
 });
 
-function readStoredLang(): Lang {
-  if (typeof window === "undefined") return "de";
+let listeners: Array<() => void> = [];
+
+function subscribe(callback: () => void) {
+  listeners.push(callback);
+  return () => {
+    listeners = listeners.filter((l) => l !== callback);
+  };
+}
+
+function getSnapshot(): Lang {
   const stored = localStorage.getItem("lang");
   return stored === "en" || stored === "de" ? stored : "de";
 }
 
+function getServerSnapshot(): Lang {
+  return "de";
+}
+
+function setStoredLang(lang: Lang) {
+  localStorage.setItem("lang", lang);
+  listeners.forEach((l) => l());
+}
+
 export function LangProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLangState] = useState<Lang>("de");
-  const [mounted, setMounted] = useState<boolean>(false);
-
-  useEffect(() => {
-    setLangState(readStoredLang());
-    setMounted(true);
-  }, []);
-
-  const setLang = (l: Lang) => {
-    localStorage.setItem("lang", l);
-    setLangState(l);
-  };
-
-  if (!mounted) {
-    return (
-      <LangContext.Provider value={{ lang: "de", setLang, t: translations.de }}>
-        {children}
-      </LangContext.Provider>
-    );
-  }
+  const lang = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   return (
-    <LangContext.Provider value={{ lang, setLang, t: translations[lang] }}>
+    <LangContext.Provider
+      value={{ lang, setLang: setStoredLang, t: translations[lang] }}
+    >
       {children}
     </LangContext.Provider>
   );

@@ -93,6 +93,7 @@ export const translations = {
       statusBankrupt: "BANKRUPT — Infrastruktur offline. Endstand eingefroren.",
       statusNotStarted:
         "Spiel noch nicht gestartet — du kannst aber schon planen.",
+      statusPaused: "Spiel pausiert — warte auf den Host.",
       statusDraining: (rate: string) =>
         `Wallet schrumpft (${rate}/s) — Infrastruktur zu teuer für aktuellen Durchsatz.`,
       statusBottleneck: (n: number) => `Engpass: ${n} req/s gehen verloren.`,
@@ -195,6 +196,7 @@ export const translations = {
       noTeamsYet: "No teams active yet.",
       statusBankrupt: "BANKRUPT — Infrastructure offline. Final score frozen.",
       statusNotStarted: "Game not started yet — you can plan ahead.",
+      statusPaused: "Game paused — waiting for the host.",
       statusDraining: (rate: string) =>
         `Wallet draining (${rate}/s) — infrastructure too expensive for current throughput.`,
       statusBottleneck: (n: number) => `Bottleneck: ${n} req/s being dropped.`,

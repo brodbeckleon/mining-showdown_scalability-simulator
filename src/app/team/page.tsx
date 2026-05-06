@@ -344,13 +344,15 @@ export default function TeamPage() {
 
   const statusText = bankrupt
     ? t.team.statusBankrupt
-    : !game.running
+    : !game.running && !game.started_at
       ? t.team.statusNotStarted
-      : earnRate < 0
-        ? t.team.statusDraining(earnRate.toFixed(3))
-        : metrics.dropped > 1
-          ? t.team.statusBottleneck(Math.round(metrics.dropped))
-          : t.team.statusOk;
+      : !game.running
+        ? t.team.statusPaused
+        : earnRate < 0
+          ? t.team.statusDraining(earnRate.toFixed(3))
+          : metrics.dropped > 1
+            ? t.team.statusBottleneck(Math.round(metrics.dropped))
+            : t.team.statusOk;
 
   return (
     <main className="min-h-screen p-3 md:p-5">
