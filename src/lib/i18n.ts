@@ -7,7 +7,7 @@ export type Lang = "de" | "en";
 export const translations = {
   de: {
     common: {
-      back: "← zurück",
+      back: "zurück",
       leave: "verlassen",
     },
     home: {
@@ -113,7 +113,7 @@ export const translations = {
   },
   en: {
     common: {
-      back: "← back",
+      back: "back",
       leave: "leave",
     },
     home: {

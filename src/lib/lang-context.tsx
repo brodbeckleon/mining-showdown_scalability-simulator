@@ -20,11 +20,20 @@ function readStoredLang(): Lang {
 
 export function LangProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = useState<Lang>(readStoredLang);
+  const [mounted, setMounted] = useState<boolean>(false);
 
   const setLang = (l: Lang) => {
     localStorage.setItem("lang", l);
     setLangState(l);
   };
+
+  if (!mounted) {
+    return (
+      <LangContext.Provider value={{ lang: "de", setLang, t: translations.de }}>
+        {children}
+      </LangContext.Provider>
+    );
+  }
 
   return (
     <LangContext.Provider value={{ lang, setLang, t: translations[lang] }}>
