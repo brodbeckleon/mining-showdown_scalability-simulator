@@ -26,6 +26,8 @@ import type { TeamConfig, GameRow, TeamRow } from "@/lib/types";
 import { DEFAULT_CFG, DEFAULT_GAME } from "@/lib/defaults";
 import { useLang } from "@/lib/lang-context";
 
+const SESSION_TEAM_KEY = "team_session";
+
 export default function TeamPage() {
   const { t } = useLang();
   const [stage, setStage] = useState<"register" | "playing">("register");
@@ -51,6 +53,40 @@ export default function TeamPage() {
   useEffect(() => {
     teamIdRef.current = teamId;
   }, [teamId]);
+
+  // ─── Session wiederherstellen nach Reload ─────────────────────────────────
+  useEffect(() => {
+    const stored = sessionStorage.getItem(SESSION_TEAM_KEY);
+    if (!stored) return;
+    let parsed: { teamId: string; teamName: string; color: string };
+    try {
+      parsed = JSON.parse(stored);
+    } catch {
+      sessionStorage.removeItem(SESSION_TEAM_KEY);
+      return;
+    }
+    supabase()
+      .from("teams")
+      .select("*")
+      .eq("id", parsed.teamId)
+      .single()
+      .then(({ data }) => {
+        if (!data) {
+          sessionStorage.removeItem(SESSION_TEAM_KEY);
+          return;
+        }
+        setTeamId(parsed.teamId);
+        setTeamName(parsed.teamName);
+        setColor(parsed.color);
+        setCfg(data.cfg ?? DEFAULT_CFG);
+        scoreRef.current = data.score ?? 0;
+        setScore(data.score ?? 0);
+        walletRef.current = data.wallet ?? CONSTANTS.TEAM_BUDGET;
+        setWallet(data.wallet ?? CONSTANTS.TEAM_BUDGET);
+        lastTickRef.current = Date.now();
+        setStage("playing");
+      });
+  }, []);
 
   const metrics = useMemo(
     () => computeMetrics(cfg, game.load),
@@ -94,6 +130,14 @@ export default function TeamPage() {
       walletRef.current = CONSTANTS.TEAM_BUDGET;
       setWallet(CONSTANTS.TEAM_BUDGET);
       lastTickRef.current = Date.now();
+      sessionStorage.setItem(
+        SESSION_TEAM_KEY,
+        JSON.stringify({
+          teamId: data.id,
+          teamName: trimmed,
+          color: teamColor,
+        }),
+      );
       setStage("playing");
     } catch (e) {
       setError(e instanceof Error ? e.message : t.team.errorFallback);
@@ -206,17 +250,6 @@ export default function TeamPage() {
 
     return () => clearInterval(interval);
   }, [stage, teamId, game.load, game.running]);
-
-  // ─── Cleanup beim Verlassen ───────────────────────────────────────────────
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      const id = teamIdRef.current;
-      if (!id) return;
-      supabase().from("teams").delete().eq("id", id);
-    };
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, []);
 
   // ─── Registrierungs-Stage ─────────────────────────────────────────────────
   if (stage === "register") {
@@ -341,6 +374,11 @@ export default function TeamPage() {
           <Link
             href="/"
             className="text-xs text-zinc-500 hover:text-zinc-300 font-jb"
+            onClick={() => {
+              sessionStorage.removeItem(SESSION_TEAM_KEY);
+              const id = teamIdRef.current;
+              if (id) supabase().from("teams").delete().eq("id", id);
+            }}
           >
             {t.common.leave}
           </Link>

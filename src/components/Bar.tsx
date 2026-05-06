@@ -7,7 +7,12 @@ type Props = {
   goldOverflow?: boolean;
 };
 
-export function Bar({ percent, color, criticalAt = 95, goldOverflow = false }: Props) {
+export function Bar({
+  percent,
+  color,
+  criticalAt = 95,
+  goldOverflow = false,
+}: Props) {
   const clamped = Math.min(100, Math.max(0, percent));
   const isCritical = percent >= criticalAt;
   return (
