@@ -8,12 +8,12 @@ import type { TeamConfig, Metrics } from "./types";
 
 export const CONSTANTS = {
   CORE_CAP: 32, // req/s pro CPU-Kern
-  RAM_PER_REQ: 400, // MB pro in-flight Request
+  RAM_PER_REQ: 300, // MB pro in-flight Request
   DB_CAP_PER_SHARD: 850, // req/s pro Shard
   APP_BASE_MS: 18, // Basis-Latenz Application-Tier
   DB_BASE_MS: 8, // Basis-Latenz Data-Tier
   COST_CORE: 6, // $/h pro Kern
-  COST_GB_RAM: 4, // $/h pro GB
+  COST_GB_RAM: 2, // $/h pro GB
   COST_LB: 12, // $/h für Load Balancer
   COST_SHARD: 9, // $/h pro Shard
   TEAM_BUDGET: 80, // Startkapital (Coins)

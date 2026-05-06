@@ -467,7 +467,7 @@ export default function TeamPage() {
                 label="RAM"
                 value={cfg.ramPerNode}
                 min={1}
-                max={32}
+                max={64}
                 onChange={(v) => update({ ramPerNode: v })}
                 unit="GB"
               />
