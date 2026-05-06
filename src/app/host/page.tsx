@@ -130,7 +130,7 @@ export default function HostPage() {
       await sb.from("teams").delete().eq("game_id", GAME_ID);
       await sb
         .from("games")
-        .update({ load: 200, running: false, started_at: null })
+        .update({ load: 50, running: false, started_at: null })
         .eq("id", GAME_ID);
     }
     setGame({ ...DEFAULT_GAME, running: false, started_at: null });

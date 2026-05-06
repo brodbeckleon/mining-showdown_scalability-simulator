@@ -371,21 +371,32 @@ export default function TeamPage() {
                   </h2>
                 </div>
                 <span
-                  className={`text-sm font-jb tabular-nums ${bankrupt ? "text-red-400" : wallet < 30 ? "text-amber-400" : "text-emerald-400"}`}
+                  className={`text-sm font-jb tabular-nums ${
+                    bankrupt || wallet < 20
+                      ? "text-red-400"
+                      : wallet < 50
+                        ? "text-amber-400"
+                        : wallet > 100
+                          ? "text-yellow-300"
+                          : "text-emerald-400"
+                  }`}
                 >
-                  {wallet.toFixed(1)} / {CONSTANTS.TEAM_BUDGET}
+                  {wallet.toFixed(1)} coins
                 </span>
               </div>
               <Bar
-                percent={Math.min(200, (wallet / CONSTANTS.TEAM_BUDGET) * 100)}
+                percent={Math.min(100, wallet)}
                 color={
-                  bankrupt
+                  bankrupt || wallet < 20
                     ? "bg-red-500"
-                    : wallet < 30
+                    : wallet < 50
                       ? "bg-amber-500"
-                      : "bg-emerald-500"
+                      : wallet > 100
+                        ? "bg-amber-400"
+                        : "bg-emerald-500"
                 }
-                criticalAt={20}
+                criticalAt={101}
+                goldOverflow={wallet > 100}
               />
               {game.running && !bankrupt && (
                 <div
