@@ -14,12 +14,12 @@ Mining Showdown is a real-time multiplayer game designed to teach distributed sy
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Framework | Next.js 15, React 18, TypeScript |
-| Styling | Tailwind CSS, Lucide React |
-| Database | Supabase (PostgreSQL) |
-| Realtime | Supabase Realtime (postgres_changes) |
+| Layer     | Technology                           |
+| --------- | ------------------------------------ |
+| Framework | Next.js 15, React 18, TypeScript     |
+| Styling   | Tailwind CSS, Lucide React           |
+| Database  | Supabase (PostgreSQL)                |
+| Realtime  | Supabase Realtime (postgres_changes) |
 
 ---
 
@@ -59,12 +59,12 @@ npm run typecheck # Type check without emitting
 
 ## Pages
 
-| Route | Audience | Description |
-|---|---|---|
-| `/` | Everyone | Landing page with game explanation and links |
-| `/team` | Players | Join a team, configure infrastructure, monitor live score and wallet |
-| `/beamer` | Projector | Live leaderboard with strategy classification overlay (press `S`) |
-| `/host` | Game master | Password-protected console to start/pause/reset the game and control global load |
+| Route     | Audience    | Description                                                                      |
+| --------- | ----------- | -------------------------------------------------------------------------------- |
+| `/`       | Everyone    | Landing page with game explanation and links                                     |
+| `/team`   | Players     | Join a team, configure infrastructure, monitor live score and wallet             |
+| `/beamer` | Projector   | Live leaderboard with strategy classification overlay (press `S`)                |
+| `/host`   | Game master | Password-protected console to start/pause/reset the game and control global load |
 
 ---
 
@@ -78,11 +78,11 @@ Process as many incoming HTTP requests as possible before the game ends. Drops (
 
 Each team configures three scaling dimensions:
 
-| Dimension | Controls | Max |
-|---|---|---|
-| Vertical | CPU cores per node (1–16), RAM per node (1–64 GB) | 16 cores × 32 req/s = 512 req/s |
-| Horizontal | Node count (1–6) + Load Balancer toggle | Requires LB to activate extra nodes |
-| Sharding | DB shards (1–6) | 6 × 850 req/s = 5100 req/s DB capacity |
+| Dimension  | Controls                                          | Max                                    |
+| ---------- | ------------------------------------------------- | -------------------------------------- |
+| Vertical   | CPU cores per node (1–16), RAM per node (1–64 GB) | 16 cores × 32 req/s = 512 req/s        |
+| Horizontal | Node count (1–6) + Load Balancer toggle           | Requires LB to activate extra nodes    |
+| Sharding   | DB shards (1–6)                                   | 6 × 850 req/s = 5100 req/s DB capacity |
 
 > Without the Load Balancer enabled, only Node 1 is active regardless of node count — a classic misconfiguration.
 
@@ -94,14 +94,14 @@ Teams start with **80 Coins**. Every second:
 wallet += (throughput × EARN_RATE) - (infra_cost × SPEND_RATE)
 ```
 
-| Constant | Value |
-|---|---|
-| `EARN_RATE` | 0.006 coins per processed request |
-| `SPEND_RATE` | 0.01 coins per $/h infrastructure per second |
-| `COST_CORE` | $6/h per CPU core |
-| `COST_GB_RAM` | $4/h per GB RAM |
-| `COST_LB` | $12/h flat |
-| `COST_SHARD` | $9/h per shard |
+| Constant      | Value                                        |
+| ------------- | -------------------------------------------- |
+| `EARN_RATE`   | 0.006 coins per processed request            |
+| `SPEND_RATE`  | 0.01 coins per $/h infrastructure per second |
+| `COST_CORE`   | $6/h per CPU core                            |
+| `COST_GB_RAM` | $4/h per GB RAM                              |
+| `COST_LB`     | $12/h flat                                   |
+| `COST_SHARD`  | $9/h per shard                               |
 
 Wallet ≤ 0 = **bankruptcy** → infrastructure goes offline, final score is frozen.
 
@@ -110,24 +110,29 @@ Wallet ≤ 0 = **bankruptcy** → infrastructure goes offline, final score is fr
 The simulation uses a simplified **M/M/1 queuing approximation** per tier (`src/lib/simulation.ts`):
 
 **Capacity:**
+
 ```
 cpuCapacity = activeNodes × cpuPerNode × 32 req/s
 dbCapacity  = shards × 850 req/s
 ```
 
 **Response Time** (explodes as utilization approaches 100%):
+
 ```
 responseTime = 18ms / (1 - appUtil) + 8ms / (1 - dbUtil)
 ```
 
 **RAM** (via Little's Law):
+
 ```
 inflight   = load × (responseTime / 1000)
 ramUsed    = inflight × 300 MB
 ```
+
 If RAM usage exceeds 100%, throughput is throttled proportionally.
 
 **Throughput & Drops:**
+
 ```
 throughput = min(load, cpuCapacity, dbCapacity)
 if ramUsed > ramTotal: throughput *= ramTotal / ramUsed
@@ -136,18 +141,18 @@ dropped    = load - throughput
 
 ### Bottleneck Detection
 
-| State | Condition | Indicator |
-|---|---|---|
-| Warning | utilization > 70% | Amber |
-| Bottleneck | utilization ≥ 95% | Red |
-| None | utilization ≤ 70% | Green |
+| State      | Condition         | Indicator |
+| ---------- | ----------------- | --------- |
+| Warning    | utilization > 70% | Amber     |
+| Bottleneck | utilization ≥ 95% | Red       |
+| None       | utilization ≤ 70% | Green     |
 
 ### Host Load Phases (preset buttons)
 
-| Phase | Load |
-|---|---|
-| Phase 1 | 200 req/s |
-| Phase 2 | 800 req/s |
+| Phase   | Load       |
+| ------- | ---------- |
+| Phase 1 | 200 req/s  |
+| Phase 2 | 800 req/s  |
 | Phase 3 | 1800 req/s |
 
 ---
@@ -156,14 +161,14 @@ dropped    = load - throughput
 
 Teams are automatically classified into one of six strategies (shown on the Beamer):
 
-| Strategy | Description |
-|---|---|
-| **Baseline** | 1 node, minimal resources |
-| **Vertical** | 1 node, scaled-up CPU/RAM |
-| **Load Balanced** | Multiple nodes with LB enabled |
-| **Combined** | Multiple large nodes with LB |
-| **Sharded** | Multiple nodes with DB sharding |
-| **Misconfig** | Multiple nodes without LB (only node 1 active) |
+| Strategy          | Description                                    |
+| ----------------- | ---------------------------------------------- |
+| **Baseline**      | 1 node, minimal resources                      |
+| **Vertical**      | 1 node, scaled-up CPU/RAM                      |
+| **Load Balanced** | Multiple nodes with LB enabled                 |
+| **Combined**      | Multiple large nodes with LB                   |
+| **Sharded**       | Multiple nodes with DB sharding                |
+| **Misconfig**     | Multiple nodes without LB (only node 1 active) |
 
 Classification logic is in `src/lib/strategies.ts`.
 
@@ -174,6 +179,7 @@ Classification logic is in `src/lib/strategies.ts`.
 Two tables are required:
 
 **`games`**
+
 ```sql
 id          uuid primary key
 load        integer
@@ -183,6 +189,7 @@ created_at  timestamptz
 ```
 
 **`teams`**
+
 ```sql
 id             uuid primary key
 game_id        uuid references games(id)

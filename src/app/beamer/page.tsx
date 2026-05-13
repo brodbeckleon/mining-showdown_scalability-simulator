@@ -99,23 +99,26 @@ export default function BeamerPage() {
     <main className="min-h-screen p-6 lg:p-10 relative">
       <Link
         href="/"
-        className="absolute top-3 right-3 text-[10px] text-zinc-700 hover:text-zinc-500 font-jb z-10"
+        className="absolute top-3 right-3 text-[10px] text-zinc-400 dark:text-zinc-700 hover:text-zinc-600 dark:hover:text-zinc-500 font-jb z-10"
       >
         {t.common.back}
       </Link>
 
       <div className="max-w-7xl mx-auto">
-        {/* ─── Header ────────────────────────────────────────────────── */}
-        <header className="flex items-end justify-between mb-8 pb-5 border-b border-zinc-800 gap-6 flex-wrap">
+        {/* ─── Header ────────────────────────────────────────────── */}
+        <header className="flex items-end justify-between mb-8 pb-5 border-b border-zinc-200 dark:border-zinc-800 gap-6 flex-wrap">
           <div>
             <div className="flex items-center gap-2.5 mb-2">
               <div className="w-2.5 h-2.5 bg-emerald-500 animate-pulse-mine" />
-              <span className="text-xs uppercase tracking-[0.4em] text-emerald-400 font-jb">
+              <span className="text-xs uppercase tracking-[0.4em] text-emerald-500 dark:text-emerald-400 font-jb">
                 {game.running ? t.beamer.live : t.beamer.waiting}
               </span>
             </div>
             <h1 className="text-5xl lg:text-6xl font-bold tracking-tight">
-              MINING <span className="text-emerald-400">SHOWDOWN</span>
+              MINING{" "}
+              <span className="text-emerald-500 dark:text-emerald-400">
+                SHOWDOWN
+              </span>
             </h1>
           </div>
           <div className="flex items-end gap-6">
@@ -123,7 +126,7 @@ export default function BeamerPage() {
               <div className="text-[11px] uppercase tracking-widest text-zinc-500 font-jb mb-1">
                 {t.beamer.globalLoad}
               </div>
-              <div className="text-5xl font-jb tabular-nums text-amber-400">
+              <div className="text-5xl font-jb tabular-nums text-amber-500 dark:text-amber-400">
                 {game.load}
               </div>
               <div className="text-xs text-zinc-500 font-jb">
@@ -134,15 +137,15 @@ export default function BeamerPage() {
               onClick={() => setShowStrategies((v) => !v)}
               className={`flex items-center gap-1.5 px-3 py-2 border transition-colors text-xs font-jb ${
                 showStrategies
-                  ? "border-emerald-500 bg-emerald-500/10 text-emerald-400"
-                  : "border-zinc-700 hover:border-zinc-500 text-zinc-400"
+                  ? "border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                  : "border-zinc-300 dark:border-zinc-700 hover:border-zinc-500 text-zinc-500 dark:text-zinc-400"
               }`}
               title="Tastenkürzel: S"
             >
               {showStrategies ? <EyeOff size={13} /> : <Eye size={13} />}
               <BookOpen size={13} />
               <span>{t.beamer.strategies}</span>
-              <kbd className="ml-1 px-1.5 py-0.5 border border-zinc-700 text-[9px] text-zinc-500">
+              <kbd className="ml-1 px-1.5 py-0.5 border border-zinc-300 dark:border-zinc-700 text-[9px] text-zinc-500">
                 S
               </kbd>
             </button>
@@ -154,12 +157,12 @@ export default function BeamerPage() {
           <div className="text-center py-32">
             <Users
               size={48}
-              className="text-zinc-700 mx-auto mb-4 animate-pulse"
+              className="text-zinc-300 dark:text-zinc-700 mx-auto mb-4 animate-pulse"
             />
-            <div className="text-2xl text-zinc-600 font-jb">
+            <div className="text-2xl text-zinc-400 dark:text-zinc-600 font-jb">
               {t.beamer.waitingTeams}
             </div>
-            <div className="text-sm text-zinc-700 mt-2 font-jb">
+            <div className="text-sm text-zinc-400 dark:text-zinc-700 mt-2 font-jb">
               {t.beamer.waitingHint}
             </div>
           </div>
@@ -225,8 +228,10 @@ export default function BeamerPage() {
                   <div
                     key={tm.id}
                     className={`relative border ${
-                      i === 0 ? "border-zinc-700" : "border-zinc-800"
-                    } bg-zinc-900/30 overflow-hidden ${stale ? "opacity-40" : ""}`}
+                      i === 0
+                        ? "border-zinc-300 dark:border-zinc-700"
+                        : "border-zinc-200 dark:border-zinc-800"
+                    } bg-zinc-100/50 dark:bg-zinc-900/30 overflow-hidden ${stale ? "opacity-40" : ""}`}
                   >
                     <div
                       className="absolute inset-y-0 left-0 transition-all duration-1000"
@@ -263,15 +268,18 @@ export default function BeamerPage() {
                             </span>
                           )}
                           {stale && (
-                            <WifiOff size={13} className="text-zinc-600" />
+                            <WifiOff
+                              size={13}
+                              className="text-zinc-400 dark:text-zinc-600"
+                            />
                           )}
                           {tm.over_budget && (
-                            <span className="text-[10px] uppercase tracking-widest text-red-400 font-jb">
+                            <span className="text-[10px] uppercase tracking-widest text-red-500 dark:text-red-400 font-jb">
                               BANKRUPT
                             </span>
                           )}
                           {!tm.over_budget && (tm.dropped ?? 0) > 5 && (
-                            <span className="text-[10px] uppercase tracking-widest text-amber-400 font-jb">
+                            <span className="text-[10px] uppercase tracking-widest text-amber-500 dark:text-amber-400 font-jb">
                               DROPS
                             </span>
                           )}
@@ -283,10 +291,12 @@ export default function BeamerPage() {
                             {tm.cfg.cpuPerNode}c · {tm.cfg.ramPerNode}gb
                           </span>
                           {tm.cfg.loadBalancer && (
-                            <span className="text-emerald-400">+LB</span>
+                            <span className="text-emerald-500 dark:text-emerald-400">
+                              +LB
+                            </span>
                           )}
                           {tm.cfg.shards > 1 && (
-                            <span className="text-violet-400">
+                            <span className="text-violet-500 dark:text-violet-400">
                               {tm.cfg.shards} shards
                             </span>
                           )}
@@ -303,13 +313,13 @@ export default function BeamerPage() {
                         <div className="text-[10px] text-zinc-500 font-jb">
                           {Math.round(tm.throughput ?? 0)}/s
                           {(tm.dropped ?? 0) > 1 && (
-                            <span className="text-red-400 ml-1.5">
+                            <span className="text-red-500 dark:text-red-400 ml-1.5">
                               −{Math.round(tm.dropped)}
                             </span>
                           )}
                         </div>
                         <div
-                          className={`text-[10px] font-jb tabular-nums ${(tm.wallet ?? 100) < 20 ? "text-amber-400" : "text-zinc-600"}`}
+                          className={`text-[10px] font-jb tabular-nums ${(tm.wallet ?? 100) < 20 ? "text-amber-500 dark:text-amber-400" : "text-zinc-400 dark:text-zinc-600"}`}
                         >
                           {(tm.wallet ?? 100).toFixed(0)} coins
                         </div>
@@ -326,7 +336,7 @@ export default function BeamerPage() {
         )}
 
         {/* ─── Footer ───────────────────────────────────────────────── */}
-        <footer className="mt-10 flex items-center justify-between text-[10px] text-zinc-700 font-jb">
+        <footer className="mt-10 flex items-center justify-between text-[10px] text-zinc-400 dark:text-zinc-700 font-jb">
           <span>
             {t.beamer.labFooter} · {t.beamer.teams(sorted.length)}
           </span>

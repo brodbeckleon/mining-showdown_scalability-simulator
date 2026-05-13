@@ -169,8 +169,8 @@ export default function HostPage() {
       <main className="min-h-screen flex items-center justify-center p-6">
         <div className="w-full max-w-xs">
           <div className="flex items-center gap-2 mb-6">
-            <Lock size={16} className="text-amber-400" />
-            <span className="text-[11px] uppercase tracking-[0.3em] text-amber-400 font-jb">
+            <Lock size={16} className="text-amber-500 dark:text-amber-400" />
+            <span className="text-[11px] uppercase tracking-[0.3em] text-amber-500 dark:text-amber-400 font-jb">
               Host Console
             </span>
           </div>
@@ -185,20 +185,20 @@ export default function HostPage() {
             onChange={(e) => setPwInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && submitPassword()}
             placeholder={t.host.password}
-            className={`w-full bg-zinc-900 border outline-none px-3 py-2.5 text-sm font-jb mb-3 transition-colors ${
+            className={`w-full bg-zinc-100 dark:bg-zinc-900 border outline-none px-3 py-2.5 text-sm font-jb mb-3 transition-colors ${
               pwError
-                ? "border-red-500 text-red-400"
-                : "border-zinc-700 focus:border-amber-500"
+                ? "border-red-500 text-red-500 dark:text-red-400"
+                : "border-zinc-300 dark:border-zinc-700 focus:border-amber-500"
             }`}
           />
           {pwError && (
-            <p className="text-xs text-red-400 font-jb mb-3">
+            <p className="text-xs text-red-500 dark:text-red-400 font-jb mb-3">
               {t.host.wrongPassword}
             </p>
           )}
           <button
             onClick={submitPassword}
-            className="w-full bg-amber-500 text-zinc-950 font-medium py-2.5 hover:bg-amber-400 transition-colors font-jb text-sm"
+            className="w-full bg-amber-500 text-white dark:text-zinc-950 font-medium py-2.5 hover:bg-amber-400 transition-colors font-jb text-sm"
           >
             {t.host.login}
           </button>
@@ -212,15 +212,15 @@ export default function HostPage() {
       <div className="max-w-3xl mx-auto">
         <Link
           href="/"
-          className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 font-jb mb-4"
+          className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 font-jb mb-4"
         >
           <ArrowLeft size={12} /> {t.common.back}
         </Link>
 
-        <header className="mb-5 pb-3 border-b border-zinc-800">
+        <header className="mb-5 pb-3 border-b border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center gap-2 mb-1">
-            <Users size={14} className="text-amber-400" />
-            <span className="text-[11px] uppercase tracking-[0.3em] text-amber-400 font-jb">
+            <Users size={14} className="text-amber-500 dark:text-amber-400" />
+            <span className="text-[11px] uppercase tracking-[0.3em] text-amber-500 dark:text-amber-400 font-jb">
               Host Console
             </span>
           </div>
@@ -228,7 +228,11 @@ export default function HostPage() {
           <p className="text-xs text-zinc-500 font-jb mt-1">
             {t.host.connected(teams.length)} ·{" "}
             <span
-              className={game.running ? "text-emerald-400" : "text-zinc-500"}
+              className={
+                game.running
+                  ? "text-emerald-500 dark:text-emerald-400"
+                  : "text-zinc-500"
+              }
             >
               {game.running ? t.host.running : t.host.paused}
             </span>
@@ -236,7 +240,7 @@ export default function HostPage() {
         </header>
 
         {/* ─── Spielsteuerung ────────────────────────────────────────── */}
-        <section className="border border-zinc-800 bg-zinc-900/30 p-5 mb-4">
+        <section className="border border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-900/30 p-5 mb-4">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold">{t.host.gameStatus}</h2>
             <div className="flex items-center gap-2">
@@ -250,14 +254,14 @@ export default function HostPage() {
               ) : (
                 <button
                   onClick={startGame}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-zinc-950 hover:bg-emerald-400 transition-colors text-xs font-jb"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-white dark:text-zinc-950 hover:bg-emerald-400 transition-colors text-xs font-jb"
                 >
                   <Play size={12} /> Start
                 </button>
               )}
               <button
                 onClick={handleReset}
-                className="flex items-center gap-1.5 px-3 py-1.5 border border-red-500/50 hover:bg-red-500/10 text-red-400 transition-colors text-xs font-jb"
+                className="flex items-center gap-1.5 px-3 py-1.5 border border-red-500/50 hover:bg-red-500/10 text-red-500 dark:text-red-400 transition-colors text-xs font-jb"
               >
                 <RotateCcw size={12} /> Reset
               </button>
@@ -278,25 +282,27 @@ export default function HostPage() {
           <div className="mt-4 grid grid-cols-3 gap-2 text-xs font-jb">
             <button
               onClick={() => updateGame({ load: 200 })}
-              className="border border-zinc-700 hover:border-emerald-500 py-2 transition-colors"
+              className="border border-zinc-300 dark:border-zinc-700 hover:border-emerald-500 py-2 transition-colors"
             >
-              <div className="text-emerald-400">Phase 1</div>
+              <div className="text-emerald-500 dark:text-emerald-400">
+                Phase 1
+              </div>
               <div className="text-zinc-500 text-[10px]">200 req/s · easy</div>
             </button>
             <button
               onClick={() => updateGame({ load: 800 })}
-              className="border border-zinc-700 hover:border-amber-500 py-2 transition-colors"
+              className="border border-zinc-300 dark:border-zinc-700 hover:border-amber-500 py-2 transition-colors"
             >
-              <div className="text-amber-400">Phase 2</div>
+              <div className="text-amber-500 dark:text-amber-400">Phase 2</div>
               <div className="text-zinc-500 text-[10px]">
                 800 req/s · brutal
               </div>
             </button>
             <button
               onClick={() => updateGame({ load: 1800 })}
-              className="border border-zinc-700 hover:border-red-500 py-2 transition-colors"
+              className="border border-zinc-300 dark:border-zinc-700 hover:border-red-500 py-2 transition-colors"
             >
-              <div className="text-red-400">Phase 3</div>
+              <div className="text-red-500 dark:text-red-400">Phase 3</div>
               <div className="text-zinc-500 text-[10px]">
                 1800 req/s · chaos
               </div>
@@ -305,7 +311,7 @@ export default function HostPage() {
         </section>
 
         {/* ─── Teams ────────────────────────────────────────────────── */}
-        <section className="border border-zinc-800 bg-zinc-900/30 p-5">
+        <section className="border border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-900/30 p-5">
           <h2 className="text-sm font-semibold mb-3 flex items-center gap-2">
             <Users size={14} /> {t.host.connectedTeams}
           </h2>
@@ -318,7 +324,7 @@ export default function HostPage() {
                 return (
                   <div
                     key={tm.id}
-                    className="flex items-center gap-3 text-xs font-jb py-1.5 border-b border-zinc-800/50"
+                    className="flex items-center gap-3 text-xs font-jb py-1.5 border-b border-zinc-200/50 dark:border-zinc-800/50"
                   >
                     <span className="w-5 text-zinc-500 tabular-nums">
                       #{i + 1}
@@ -327,22 +333,28 @@ export default function HostPage() {
                       className="w-2.5 h-2.5"
                       style={{ background: tm.color }}
                     />
-                    <span className="flex-1 truncate text-zinc-200">
+                    <span className="flex-1 truncate text-zinc-700 dark:text-zinc-200">
                       {tm.name}
                     </span>
                     {stale ? (
-                      <WifiOff size={11} className="text-zinc-600" />
+                      <WifiOff
+                        size={11}
+                        className="text-zinc-400 dark:text-zinc-600"
+                      />
                     ) : (
-                      <Wifi size={11} className="text-emerald-400" />
+                      <Wifi
+                        size={11}
+                        className="text-emerald-500 dark:text-emerald-400"
+                      />
                     )}
-                    <span className="tabular-nums w-20 text-right text-zinc-300">
+                    <span className="tabular-nums w-20 text-right text-zinc-700 dark:text-zinc-300">
                       {fmt(tm.score)}
                     </span>
                     <span className="tabular-nums w-16 text-right text-zinc-500">
                       ${(tm.cost ?? 0).toFixed(0)}/h
                     </span>
                     <span
-                      className={`tabular-nums w-16 text-right font-jb ${tm.over_budget ? "text-red-400" : (tm.wallet ?? 100) < 20 ? "text-amber-400" : "text-zinc-500"}`}
+                      className={`tabular-nums w-16 text-right font-jb ${tm.over_budget ? "text-red-500 dark:text-red-400" : (tm.wallet ?? 100) < 20 ? "text-amber-500 dark:text-amber-400" : "text-zinc-500"}`}
                     >
                       {tm.over_budget
                         ? "BKRPT"
@@ -350,7 +362,7 @@ export default function HostPage() {
                     </span>
                     <button
                       onClick={() => deleteTeam(tm.id, tm.name)}
-                      className="ml-1 text-zinc-700 hover:text-red-400 transition-colors"
+                      className="ml-1 text-zinc-400 dark:text-zinc-700 hover:text-red-500 dark:hover:text-red-400 transition-colors"
                       title={t.host.deleteTeamTitle}
                     >
                       <Trash2 size={12} />

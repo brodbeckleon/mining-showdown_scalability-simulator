@@ -26,8 +26,8 @@ export function StrategyPanel({ teams }: Props) {
     grouped[key].reduce((sum, tm) => sum + (tm.score ?? 0), 0);
 
   return (
-    <section className="border border-zinc-800 bg-zinc-900/30 p-5 lg:p-6">
-      <div className="flex items-baseline justify-between mb-4 pb-3 border-b border-zinc-800">
+    <section className="border border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-900/30 p-5 lg:p-6">
+      <div className="flex items-baseline justify-between mb-4 pb-3 border-b border-zinc-200 dark:border-zinc-800">
         <h2 className="text-lg lg:text-xl font-semibold tracking-tight">
           {t.strategyPanel.title}{" "}
           <span className="text-zinc-500 text-xs font-jb font-normal">
@@ -49,9 +49,9 @@ export function StrategyPanel({ teams }: Props) {
           return (
             <div
               key={key}
-              className="border bg-zinc-950/40 p-4 transition-all"
+              className="border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950/40 p-4 transition-all"
               style={{
-                borderColor: isActive ? s.color : "#27272a",
+                borderColor: isActive ? s.color : undefined,
                 boxShadow: isActive ? `inset 0 0 0 1px ${s.color}40` : "none",
               }}
             >
@@ -59,8 +59,8 @@ export function StrategyPanel({ teams }: Props) {
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2" style={{ background: s.color }} />
                   <h3
-                    className="text-sm font-semibold"
-                    style={{ color: isActive ? s.color : "#a1a1aa" }}
+                    className={`text-sm font-semibold ${isActive ? "" : "text-zinc-500 dark:text-zinc-400"}`}
+                    style={{ color: isActive ? s.color : undefined }}
                   >
                     {s.label[lang]}
                   </h3>
@@ -75,23 +75,23 @@ export function StrategyPanel({ teams }: Props) {
                 )}
               </div>
 
-              <p className="text-[11px] text-zinc-400 leading-snug font-jb mb-2">
+              <p className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-snug font-jb mb-2">
                 {s.desc[lang]}
               </p>
 
               <div className="text-[10px] font-jb space-y-0.5 mb-2">
-                <div className="text-emerald-500/70">
-                  <span className="text-zinc-600">+ </span>
+                <div className="text-emerald-600 dark:text-emerald-500/70">
+                  <span className="text-zinc-400 dark:text-zinc-600">+ </span>
                   {s.pros[lang]}
                 </div>
-                <div className="text-red-500/70">
-                  <span className="text-zinc-600">− </span>
+                <div className="text-red-600 dark:text-red-500/70">
+                  <span className="text-zinc-400 dark:text-zinc-600">− </span>
                   {s.cons[lang]}
                 </div>
               </div>
 
               {teamsHere.length > 0 && (
-                <div className="pt-2 border-t border-zinc-800 space-y-1">
+                <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800 space-y-1">
                   {teamsHere
                     .sort((a, b) => b.score - a.score)
                     .slice(0, 4)
@@ -104,7 +104,7 @@ export function StrategyPanel({ teams }: Props) {
                           className="w-1.5 h-1.5 shrink-0"
                           style={{ background: tm.color }}
                         />
-                        <span className="truncate text-zinc-300">
+                        <span className="truncate text-zinc-700 dark:text-zinc-300">
                           {tm.name}
                         </span>
                         <span className="ml-auto tabular-nums text-zinc-500">
@@ -113,7 +113,7 @@ export function StrategyPanel({ teams }: Props) {
                       </div>
                     ))}
                   {teamsHere.length > 4 && (
-                    <div className="text-[10px] text-zinc-600 font-jb">
+                    <div className="text-[10px] text-zinc-500 dark:text-zinc-600 font-jb">
                       {t.strategyPanel.more(teamsHere.length - 4)}
                     </div>
                   )}
@@ -124,7 +124,7 @@ export function StrategyPanel({ teams }: Props) {
         })}
       </div>
 
-      <p className="mt-4 text-[10px] text-zinc-600 font-jb leading-relaxed">
+      <p className="mt-4 text-[10px] text-zinc-400 dark:text-zinc-600 font-jb leading-relaxed">
         {t.strategyPanel.footer}
       </p>
     </section>

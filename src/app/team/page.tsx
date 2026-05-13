@@ -258,7 +258,7 @@ export default function TeamPage() {
         <div className="w-full max-w-md">
           <Link
             href="/"
-            className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 font-jb mb-6"
+            className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 font-jb mb-6"
           >
             <ArrowLeft size={12} /> {t.common.back}
           </Link>
@@ -271,7 +271,7 @@ export default function TeamPage() {
             <div>
               <label
                 htmlFor="team-name"
-                className="text-[11px] uppercase tracking-wider text-zinc-400 font-jb"
+                className="text-[11px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400 font-jb"
               >
                 {t.team.teamName}
               </label>
@@ -284,7 +284,7 @@ export default function TeamPage() {
                 placeholder={t.team.namePlaceholder}
                 maxLength={24}
                 autoFocus
-                className="w-full mt-1.5 bg-zinc-900 border border-zinc-700 focus:border-emerald-500 outline-none px-3 py-2.5 text-sm font-jb"
+                className="w-full mt-1.5 bg-zinc-100 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 focus:border-emerald-500 outline-none px-3 py-2.5 text-sm font-jb"
               />
               {teamName.trim() && (
                 <div className="mt-2 flex items-center gap-2 text-xs font-jb">
@@ -298,7 +298,7 @@ export default function TeamPage() {
             </div>
 
             {error && (
-              <div className="border border-red-500/40 bg-red-500/10 p-3 text-xs text-red-400 font-jb">
+              <div className="border border-red-500/40 bg-red-500/10 p-3 text-xs text-red-500 dark:text-red-400 font-jb">
                 {error}
               </div>
             )}
@@ -306,13 +306,15 @@ export default function TeamPage() {
             <button
               onClick={register}
               disabled={!teamName.trim()}
-              className="w-full bg-emerald-500 disabled:bg-zinc-800 disabled:text-zinc-600 text-zinc-950 font-medium py-2.5 hover:bg-emerald-400 transition-colors font-jb text-sm"
+              className="w-full bg-emerald-500 disabled:bg-zinc-200 dark:disabled:bg-zinc-800 disabled:text-zinc-400 dark:disabled:text-zinc-600 text-white dark:text-zinc-950 font-medium py-2.5 hover:bg-emerald-400 transition-colors font-jb text-sm"
             >
               {t.team.joinButton}
             </button>
 
-            <div className="border border-zinc-800 bg-zinc-900/30 p-3 text-xs text-zinc-400 font-jb leading-relaxed">
-              <span className="text-emerald-400">Wallet:</span>{" "}
+            <div className="border border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-900/30 p-3 text-xs text-zinc-500 dark:text-zinc-400 font-jb leading-relaxed">
+              <span className="text-emerald-500 dark:text-emerald-400">
+                Wallet:
+              </span>{" "}
               {t.team.walletHint(CONSTANTS.TEAM_BUDGET)}
             </div>
           </div>
@@ -333,14 +335,14 @@ export default function TeamPage() {
   void deployed;
 
   const statusClass = bankrupt
-    ? "border-red-500/40 bg-red-500/10 text-red-400"
+    ? "border-red-500/40 bg-red-500/10 text-red-500 dark:text-red-400"
     : !game.running
-      ? "border-zinc-700 bg-zinc-900/30 text-zinc-400"
+      ? "border-zinc-300 dark:border-zinc-700 bg-zinc-100/50 dark:bg-zinc-900/30 text-zinc-500 dark:text-zinc-400"
       : earnRate < 0
-        ? "border-amber-500/40 bg-amber-500/10 text-amber-400"
+        ? "border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400"
         : metrics.dropped > 1
-          ? "border-amber-500/40 bg-amber-500/10 text-amber-400"
-          : "border-emerald-500/40 bg-emerald-500/10 text-emerald-400";
+          ? "border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400"
+          : "border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400";
 
   const statusText = bankrupt
     ? t.team.statusBankrupt
@@ -358,16 +360,20 @@ export default function TeamPage() {
     <main className="min-h-screen p-3 md:p-5">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <header className="flex items-center justify-between mb-4 pb-3 border-b border-zinc-800">
+        <header className="flex items-center justify-between mb-4 pb-3 border-b border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center gap-3">
             <div className="w-3 h-3" style={{ background: color }} />
             <div>
               <div className="text-sm font-semibold">{teamName}</div>
               <div className="text-[10px] text-zinc-500 font-jb">
                 {game.running ? (
-                  <span className="text-emerald-400">● live</span>
+                  <span className="text-emerald-500 dark:text-emerald-400">
+                    ● live
+                  </span>
                 ) : (
-                  <span className="text-zinc-600">○ {t.team.waitingHost}</span>
+                  <span className="text-zinc-400 dark:text-zinc-600">
+                    ○ {t.team.waitingHost}
+                  </span>
                 )}{" "}
                 · {t.team.load}: {game.load} req/s
               </div>
@@ -375,7 +381,7 @@ export default function TeamPage() {
           </div>
           <Link
             href="/"
-            className="text-xs text-zinc-500 hover:text-zinc-300 font-jb"
+            className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 font-jb"
             onClick={() => {
               sessionStorage.removeItem(SESSION_TEAM_KEY);
               const id = teamIdRef.current;
@@ -402,23 +408,26 @@ export default function TeamPage() {
         <div className="grid lg:grid-cols-12 gap-4">
           {/* ─── Linke Spalte: Konfiguration ─────────────────────────── */}
           <div className="lg:col-span-4 space-y-3">
-            <section className="border border-zinc-800 bg-zinc-900/30 p-4 space-y-3">
+            <section className="border border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-900/30 p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <DollarSign size={13} className="text-emerald-400" />
-                  <h2 className="text-[11px] uppercase tracking-widest text-zinc-400 font-jb">
+                  <DollarSign
+                    size={13}
+                    className="text-emerald-500 dark:text-emerald-400"
+                  />
+                  <h2 className="text-[11px] uppercase tracking-widest text-zinc-500 dark:text-zinc-400 font-jb">
                     Wallet
                   </h2>
                 </div>
                 <span
                   className={`text-sm font-jb tabular-nums ${
                     bankrupt || wallet < 20
-                      ? "text-red-400"
+                      ? "text-red-500 dark:text-red-400"
                       : wallet < 50
-                        ? "text-amber-400"
+                        ? "text-amber-500 dark:text-amber-400"
                         : wallet > 100
-                          ? "text-yellow-300"
-                          : "text-emerald-400"
+                          ? "text-yellow-500 dark:text-yellow-300"
+                          : "text-emerald-500 dark:text-emerald-400"
                   }`}
                 >
                   {wallet.toFixed(1)} coins
@@ -440,7 +449,7 @@ export default function TeamPage() {
               />
               {game.running && !bankrupt && (
                 <div
-                  className={`text-[10px] font-jb tabular-nums ${earnRate >= 0 ? "text-emerald-400" : "text-red-400"}`}
+                  className={`text-[10px] font-jb tabular-nums ${earnRate >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-500 dark:text-red-400"}`}
                 >
                   {earnRate >= 0 ? "+" : ""}
                   {earnRate.toFixed(3)}/s · Infra ${metrics.cost.toFixed(0)}/h
@@ -448,10 +457,13 @@ export default function TeamPage() {
               )}
             </section>
 
-            <section className="border border-zinc-800 bg-zinc-900/30 p-4 space-y-3">
+            <section className="border border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-900/30 p-4 space-y-3">
               <div className="flex items-center gap-2">
-                <TrendingUp size={13} className="text-zinc-400" />
-                <h2 className="text-[11px] uppercase tracking-widest text-zinc-400 font-jb">
+                <TrendingUp
+                  size={13}
+                  className="text-zinc-500 dark:text-zinc-400"
+                />
+                <h2 className="text-[11px] uppercase tracking-widest text-zinc-500 dark:text-zinc-400 font-jb">
                   {t.team.verticalSection}
                 </h2>
               </div>
@@ -473,10 +485,13 @@ export default function TeamPage() {
               />
             </section>
 
-            <section className="border border-zinc-800 bg-zinc-900/30 p-4 space-y-3">
+            <section className="border border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-900/30 p-4 space-y-3">
               <div className="flex items-center gap-2">
-                <Network size={13} className="text-zinc-400" />
-                <h2 className="text-[11px] uppercase tracking-widest text-zinc-400 font-jb">
+                <Network
+                  size={13}
+                  className="text-zinc-500 dark:text-zinc-400"
+                />
+                <h2 className="text-[11px] uppercase tracking-widest text-zinc-500 dark:text-zinc-400 font-jb">
                   {t.team.horizontal}
                 </h2>
               </div>
@@ -496,10 +511,13 @@ export default function TeamPage() {
               />
             </section>
 
-            <section className="border border-zinc-800 bg-zinc-900/30 p-4 space-y-3">
+            <section className="border border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-900/30 p-4 space-y-3">
               <div className="flex items-center gap-2">
-                <Database size={13} className="text-zinc-400" />
-                <h2 className="text-[11px] uppercase tracking-widest text-zinc-400 font-jb">
+                <Database
+                  size={13}
+                  className="text-zinc-500 dark:text-zinc-400"
+                />
+                <h2 className="text-[11px] uppercase tracking-widest text-zinc-500 dark:text-zinc-400 font-jb">
                   {t.team.sharding}
                 </h2>
               </div>
@@ -516,11 +534,14 @@ export default function TeamPage() {
 
           {/* ─── Mitte: Topologie + Score ────────────────────────────── */}
           <div className="lg:col-span-5 space-y-3">
-            <section className="border border-zinc-800 bg-zinc-900/30 p-4">
+            <section className="border border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-900/30 p-4">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <Server size={13} className="text-zinc-400" />
-                  <h2 className="text-[11px] uppercase tracking-widest text-zinc-400 font-jb">
+                  <Server
+                    size={13}
+                    className="text-zinc-500 dark:text-zinc-400"
+                  />
+                  <h2 className="text-[11px] uppercase tracking-widest text-zinc-500 dark:text-zinc-400 font-jb">
                     {t.team.topology}
                   </h2>
                 </div>
@@ -538,7 +559,7 @@ export default function TeamPage() {
                     krit
                   </span>
                   <span className="flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 bg-zinc-600" />
+                    <span className="w-1.5 h-1.5 bg-zinc-400 dark:bg-zinc-600" />
                     idle
                   </span>
                 </div>
@@ -548,15 +569,15 @@ export default function TeamPage() {
 
             {bankrupt ? (
               <section className="border-2 border-red-500 bg-red-500/10 p-5">
-                <div className="text-[10px] uppercase tracking-widest text-red-400 font-jb mb-1">
+                <div className="text-[10px] uppercase tracking-widest text-red-500 dark:text-red-400 font-jb mb-1">
                   BANKRUPT
                 </div>
-                <div className="text-xl font-jb text-red-300">
+                <div className="text-xl font-jb text-red-600 dark:text-red-300">
                   {t.team.infraOffline}
                 </div>
                 <div className="text-xs text-zinc-500 font-jb mt-2">
                   {t.team.finalScore}:{" "}
-                  <span className="text-zinc-300 tabular-nums">
+                  <span className="text-zinc-700 dark:text-zinc-300 tabular-nums">
                     {fmt(score)}
                   </span>
                 </div>
@@ -574,12 +595,12 @@ export default function TeamPage() {
                 </div>
                 <div className="text-xs text-zinc-500 font-jb mt-1">
                   {t.team.throughput}:{" "}
-                  <span className="text-zinc-300">
+                  <span className="text-zinc-700 dark:text-zinc-300">
                     {Math.round(metrics.throughput)}
                   </span>{" "}
                   req/s
                   {metrics.dropped > 1 && (
-                    <span className="text-red-400 ml-2">
+                    <span className="text-red-500 dark:text-red-400 ml-2">
                       −{Math.round(metrics.dropped)} drops
                     </span>
                   )}
@@ -590,13 +611,13 @@ export default function TeamPage() {
 
           {/* ─── Rechte Spalte: Auslastung + Mini-Leaderboard ────────── */}
           <div className="lg:col-span-3 space-y-3">
-            <section className="border border-zinc-800 bg-zinc-900/30 p-4 space-y-3">
-              <h3 className="text-[11px] uppercase tracking-widest text-zinc-400 font-jb">
+            <section className="border border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-900/30 p-4 space-y-3">
+              <h3 className="text-[11px] uppercase tracking-widest text-zinc-500 dark:text-zinc-400 font-jb">
                 {t.team.utilization}
               </h3>
               <div className="space-y-1">
                 <div className="flex justify-between text-xs font-jb">
-                  <span className="flex items-center gap-1.5 text-zinc-400">
+                  <span className="flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400">
                     <Cpu size={11} />
                     CPU
                   </span>
@@ -608,7 +629,7 @@ export default function TeamPage() {
               </div>
               <div className="space-y-1">
                 <div className="flex justify-between text-xs font-jb">
-                  <span className="flex items-center gap-1.5 text-zinc-400">
+                  <span className="flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400">
                     <MemoryStick size={11} />
                     RAM
                   </span>
@@ -620,7 +641,7 @@ export default function TeamPage() {
               </div>
               <div className="space-y-1">
                 <div className="flex justify-between text-xs font-jb">
-                  <span className="flex items-center gap-1.5 text-zinc-400">
+                  <span className="flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400">
                     <Database size={11} />
                     DB
                   </span>
@@ -630,12 +651,12 @@ export default function TeamPage() {
                 </div>
                 <Bar percent={metrics.dbUtil * 100} color="bg-violet-500" />
               </div>
-              <div className="pt-2 border-t border-zinc-800 grid grid-cols-2 gap-2 text-xs font-jb">
+              <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800 grid grid-cols-2 gap-2 text-xs font-jb">
                 <div>
                   <div className="text-zinc-500 text-[10px] uppercase tracking-wider">
                     {t.team.responseTime}
                   </div>
-                  <div className="tabular-nums text-zinc-200">
+                  <div className="tabular-nums text-zinc-700 dark:text-zinc-200">
                     {Math.round(metrics.responseTime)} ms
                   </div>
                 </div>
@@ -643,17 +664,20 @@ export default function TeamPage() {
                   <div className="text-zinc-500 text-[10px] uppercase tracking-wider">
                     {t.team.appCap}
                   </div>
-                  <div className="tabular-nums text-zinc-200">
+                  <div className="tabular-nums text-zinc-700 dark:text-zinc-200">
                     {Math.round(metrics.cpuCapacity)} req/s
                   </div>
                 </div>
               </div>
             </section>
 
-            <section className="border border-zinc-800 bg-zinc-900/30 p-4">
+            <section className="border border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-900/30 p-4">
               <div className="flex items-center gap-2 mb-3">
-                <Trophy size={13} className="text-amber-400" />
-                <h3 className="text-[11px] uppercase tracking-widest text-zinc-400 font-jb">
+                <Trophy
+                  size={13}
+                  className="text-amber-500 dark:text-amber-400"
+                />
+                <h3 className="text-[11px] uppercase tracking-widest text-zinc-500 dark:text-zinc-400 font-jb">
                   Top 5
                 </h3>
               </div>
@@ -662,7 +686,9 @@ export default function TeamPage() {
                   <div
                     key={tm.id}
                     className={`flex items-center gap-2 text-xs font-jb ${
-                      tm.id === teamId ? "text-emerald-400" : "text-zinc-300"
+                      tm.id === teamId
+                        ? "text-emerald-600 dark:text-emerald-400"
+                        : "text-zinc-700 dark:text-zinc-300"
                     }`}
                   >
                     <span className="w-4 text-zinc-500 tabular-nums">
@@ -677,7 +703,7 @@ export default function TeamPage() {
                   </div>
                 ))}
                 {sortedTeams.length === 0 && (
-                  <div className="text-[11px] text-zinc-600 font-jb">
+                  <div className="text-[11px] text-zinc-400 dark:text-zinc-600 font-jb">
                     {t.team.noTeamsYet}
                   </div>
                 )}

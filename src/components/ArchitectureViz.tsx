@@ -1,6 +1,7 @@
 "use client";
 
 import type { TeamConfig, Metrics } from "@/lib/types";
+import { useTheme } from "@/lib/theme-context";
 
 type Props = {
   cfg: TeamConfig;
@@ -14,10 +15,20 @@ type Props = {
 export function ArchitectureViz({ cfg, metrics }: Props) {
   const { nodeCount, loadBalancer, shards } = cfg;
   const { cpuPercent, dbUtil } = metrics;
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
+  const boxBg = isDark ? "#18181b" : "#f4f4f5";
+  const nodeBg = isDark ? "#0a0a0a" : "#f9f9f9";
+  const lineColor = isDark ? "#3f3f46" : "#d4d4d8";
+  const faintLine = isDark ? "#27272a" : "#e4e4e7";
+  const labelFill = isDark ? "#52525b" : "#71717a";
+  const clientText = isDark ? "#a1a1aa" : "#52525b";
+  const lbSecondaryText = isDark ? "#71717a" : "#a1a1aa";
 
   const nodeColor = (idx: number): string => {
     const isActive = loadBalancer || idx === 0;
-    if (!isActive) return "#3f3f46";
+    if (!isActive) return isDark ? "#3f3f46" : "#d4d4d8";
     if (cpuPercent >= 90) return "#ef4444";
     if (cpuPercent >= 70) return "#f59e0b";
     return "#10b981";
@@ -54,7 +65,7 @@ export function ArchitectureViz({ cfg, metrics }: Props) {
       <text
         x={50}
         y={20}
-        fill="#52525b"
+        fill={labelFill}
         fontSize="9"
         fontFamily="JetBrains Mono"
         letterSpacing="2"
@@ -65,7 +76,7 @@ export function ArchitectureViz({ cfg, metrics }: Props) {
         x={nodeStartX + 40}
         y={20}
         textAnchor="middle"
-        fill="#52525b"
+        fill={labelFill}
         fontSize="9"
         fontFamily="JetBrains Mono"
         letterSpacing="2"
@@ -76,7 +87,7 @@ export function ArchitectureViz({ cfg, metrics }: Props) {
         x={shardStartX + 40}
         y={20}
         textAnchor="middle"
-        fill="#52525b"
+        fill={labelFill}
         fontSize="9"
         fontFamily="JetBrains Mono"
         letterSpacing="2"
@@ -90,15 +101,15 @@ export function ArchitectureViz({ cfg, metrics }: Props) {
         y={H / 2 - 18}
         width="60"
         height="36"
-        fill="#18181b"
-        stroke="#52525b"
+        fill={boxBg}
+        stroke={labelFill}
         strokeWidth="1"
       />
       <text
         x="50"
         y={H / 2 + 4}
         textAnchor="middle"
-        fill="#a1a1aa"
+        fill={clientText}
         fontSize="10"
         fontFamily="JetBrains Mono"
       >
@@ -112,7 +123,7 @@ export function ArchitectureViz({ cfg, metrics }: Props) {
           y1={H / 2}
           x2="140"
           y2={H / 2}
-          stroke="#3f3f46"
+          stroke={lineColor}
           strokeWidth="1"
         />
       ) : (
@@ -121,7 +132,7 @@ export function ArchitectureViz({ cfg, metrics }: Props) {
           y1={H / 2}
           x2={nodeStartX}
           y2={nodeStartY + nodeSpacingY / 2}
-          stroke="#3f3f46"
+          stroke={lineColor}
           strokeWidth="1"
         />
       )}
@@ -134,7 +145,7 @@ export function ArchitectureViz({ cfg, metrics }: Props) {
             y={H / 2 - 18}
             width="50"
             height="36"
-            fill="#18181b"
+            fill={boxBg}
             stroke="#10b981"
             strokeWidth="1"
           />
@@ -152,7 +163,7 @@ export function ArchitectureViz({ cfg, metrics }: Props) {
             x="165"
             y={H / 2 + 9}
             textAnchor="middle"
-            fill="#71717a"
+            fill={lbSecondaryText}
             fontSize="7"
             fontFamily="JetBrains Mono"
           >
@@ -174,7 +185,7 @@ export function ArchitectureViz({ cfg, metrics }: Props) {
                 y1={H / 2}
                 x2={nodeStartX}
                 y2={y + rectH / 2}
-                stroke={isActive ? "#3f3f46" : "#27272a"}
+                stroke={isActive ? lineColor : faintLine}
                 strokeWidth="1"
               />
             )}
@@ -183,7 +194,7 @@ export function ArchitectureViz({ cfg, metrics }: Props) {
               y={y}
               width="80"
               height={rectH}
-              fill="#0a0a0a"
+              fill={nodeBg}
               stroke={nodeColor(i)}
               strokeWidth="1"
               opacity={isActive ? 1 : 0.4}
@@ -203,7 +214,7 @@ export function ArchitectureViz({ cfg, metrics }: Props) {
                 x={nodeStartX + 40}
                 y={y + rectH + 9}
                 textAnchor="middle"
-                fill="#52525b"
+                fill={labelFill}
                 fontSize="7"
                 fontFamily="JetBrains Mono"
               >
@@ -223,7 +234,7 @@ export function ArchitectureViz({ cfg, metrics }: Props) {
                     y1={y + rectH / 2}
                     x2={shardStartX}
                     y2={sy}
-                    stroke="#27272a"
+                    stroke={faintLine}
                     strokeWidth="0.5"
                   />
                 );
@@ -243,7 +254,7 @@ export function ArchitectureViz({ cfg, metrics }: Props) {
               y={y}
               width="80"
               height={rectH}
-              fill="#0a0a0a"
+              fill={nodeBg}
               stroke={shardColor()}
               strokeWidth="1"
             />
