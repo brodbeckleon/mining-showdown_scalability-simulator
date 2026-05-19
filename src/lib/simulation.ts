@@ -19,7 +19,25 @@ export const CONSTANTS = {
   TEAM_BUDGET: 80, // Startkapital CHF-Budget
   EARN_RATE: 0.006, // Coins pro erfolgreich verarbeitetem Request (Mining)
   SPEND_RATE: 0.01, // CHF pro $/h Infrastruktur pro Sekunde
+  GAME_DURATION: 360, // Spielzeit in Sekunden (6 Minuten)
 } as const;
+
+/**
+ * Berechnet die vergangenen Sekunden seit Spielstart.
+ * Wenn pausiert, ist started_at ein 1970-Timestamp der die Sekunden kodiert.
+ */
+export function computeElapsed(
+  startedAt: string | null,
+  running: boolean,
+  now: number,
+): number {
+  if (!startedAt) return 0;
+  const ts = Date.parse(startedAt);
+  if (running) return (now - ts) / 1000;
+  // Vor Jahr 2001 → kodierter Elapsed-Wert (Sekunden × 1000 = ms seit Epoch)
+  if (ts < 978_307_200_000) return ts / 1000;
+  return 0;
+}
 
 export function computeMetrics(cfg: TeamConfig, load: number): Metrics {
   const C = CONSTANTS;

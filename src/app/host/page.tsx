@@ -12,13 +12,38 @@ import {
   ArrowLeft,
   Trash2,
   Lock,
+  Zap,
+  Timer,
 } from "lucide-react";
 import { Slider } from "@/components/Slider";
 import { supabase, GAME_ID } from "@/lib/supabase";
 import { fmt, isStale } from "@/lib/colors";
+import { CONSTANTS, computeElapsed } from "@/lib/simulation";
 import type { GameRow, TeamRow } from "@/lib/types";
 import { DEFAULT_GAME } from "@/lib/defaults";
 import { useLang } from "@/lib/lang-context";
+
+function formatTime(seconds: number): string {
+  const m = Math.floor(Math.max(0, seconds) / 60);
+  const s = Math.floor(Math.max(0, seconds) % 60);
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
+function fluctuateLoad(base: number): number {
+  const r = Math.random();
+  if (r < 0.08) {
+    // Spike: 1.8× bis 3×
+    return Math.round(Math.min(3000, base * (1.8 + Math.random() * 1.2)));
+  } else if (r < 0.15) {
+    // Einbruch: 30% bis 60%
+    return Math.round(Math.max(50, base * (0.3 + Math.random() * 0.3)));
+  } else {
+    // Normal: ±25%
+    return Math.round(
+      Math.max(50, Math.min(3000, base * (0.75 + Math.random() * 0.5))),
+    );
+  }
+}
 
 const HOST_PASSWORD = process.env.NEXT_PUBLIC_HOST_PASSWORD ?? "host";
 const SESSION_KEY = "host_authed";
@@ -70,6 +95,17 @@ export default function HostPage() {
 
   const [game, setGame] = useState<GameRow>(DEFAULT_GAME);
   const [teams, setTeams] = useState<TeamRow[]>([]);
+  const [now, setNow] = useState(Date.now());
+  const [fluctuate, setFluctuate] = useState(false);
+  const gameRef = useRef(game);
+  const fluctuateRef = useRef(fluctuate);
+  const baseLoadRef = useRef(game.load);
+  useEffect(() => {
+    gameRef.current = game;
+  }, [game]);
+  useEffect(() => {
+    fluctuateRef.current = fluctuate;
+  }, [fluctuate]);
 
   // ─── Realtime ─────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -130,14 +166,73 @@ export default function HostPage() {
     };
   }, []);
 
+  // ─── Timer-Tick + Auto-Stop ───────────────────────────────────────────────
+  useEffect(() => {
+    const id = setInterval(async () => {
+      setNow(Date.now());
+      const g = gameRef.current;
+      if (g.running && g.started_at) {
+        const gameDuration =
+          g.game_duration ??
+          DEFAULT_GAME.game_duration ??
+          CONSTANTS.GAME_DURATION;
+        const elapsed = computeElapsed(g.started_at, g.running, Date.now());
+        if (elapsed >= gameDuration) {
+          const encoded = new Date(Math.round(elapsed * 1000)).toISOString();
+          await supabase()
+            .from("games")
+            .update({ running: false, started_at: encoded })
+            .eq("id", GAME_ID);
+          setGame((prev) => ({ ...prev, running: false, started_at: encoded }));
+        }
+      }
+    }, 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  // ─── Load-Snapshot schreiben (fire-and-forget) ───────────────────────────
+  const writeSnapshot = (load: number) => {
+    supabase().from("load_snapshots").insert({ game_id: GAME_ID, load }).then();
+  };
+
+  // ─── Fluctuate-Interval ───────────────────────────────────────────────────
+  useEffect(() => {
+    if (!fluctuate || !game.running) return;
+    const id = setInterval(() => {
+      const newLoad = fluctuateLoad(baseLoadRef.current);
+      setGame((prev) => ({ ...prev, load: newLoad }));
+      supabase().from("games").update({ load: newLoad }).eq("id", GAME_ID);
+      writeSnapshot(newLoad);
+    }, 1000);
+    return () => clearInterval(id);
+  }, [fluctuate, game.running]);
+
   const updateGame = async (patch: Partial<GameRow>) => {
+    if ("load" in patch && patch.load !== undefined) {
+      baseLoadRef.current = patch.load;
+      writeSnapshot(patch.load);
+    }
     setGame((prev) => ({ ...prev, ...patch }));
     await supabase().from("games").update(patch).eq("id", GAME_ID);
   };
 
-  const startGame = () =>
-    updateGame({ running: true, started_at: new Date().toISOString() });
-  const pauseGame = () => updateGame({ running: false });
+  const startGame = () => {
+    // Fortsetzen vom pausiertem Zeitpunkt
+    const elapsed = computeElapsed(game.started_at, game.running, Date.now());
+    updateGame({
+      running: true,
+      started_at: new Date(Date.now() - elapsed * 1000).toISOString(),
+    });
+  };
+
+  const pauseGame = () => {
+    // Elapsed-Sekunden in started_at als 1970-Timestamp kodieren
+    const elapsed = computeElapsed(game.started_at, game.running, Date.now());
+    updateGame({
+      running: false,
+      started_at: new Date(Math.round(elapsed * 1000)).toISOString(),
+    });
+  };
 
   const handleReset = async () => {
     if (typeof window !== "undefined" && !window.confirm(t.host.confirmReset))
@@ -148,7 +243,7 @@ export default function HostPage() {
       await sb.from("teams").delete().eq("game_id", GAME_ID);
       await sb
         .from("games")
-        .update({ load: 50, running: false, started_at: null })
+        .update({ load: DEFAULT_GAME.load, running: false, started_at: null })
         .eq("id", GAME_ID);
     }
     setGame({ ...DEFAULT_GAME, running: false, started_at: null });
@@ -241,8 +336,31 @@ export default function HostPage() {
 
         {/* ─── Spielsteuerung ────────────────────────────────────────── */}
         <section className="border border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-900/30 p-5 mb-4">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold">{t.host.gameStatus}</h2>
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <div className="flex items-center gap-3">
+              <h2 className="text-sm font-semibold">{t.host.gameStatus}</h2>
+              {game.started_at &&
+                (() => {
+                  const gameDuration =
+                    game.game_duration ??
+                    DEFAULT_GAME.game_duration ??
+                    CONSTANTS.GAME_DURATION;
+                  const elapsed = computeElapsed(
+                    game.started_at,
+                    game.running,
+                    now,
+                  );
+                  const tl = gameDuration - elapsed;
+                  return (
+                    <div
+                      className={`flex items-center gap-1.5 text-sm font-jb tabular-nums ${tl < 60 ? "text-red-500 dark:text-red-400" : tl < 120 ? "text-amber-500 dark:text-amber-400" : "text-zinc-600 dark:text-zinc-300"}`}
+                    >
+                      <Timer size={13} />
+                      {formatTime(tl)}
+                    </div>
+                  );
+                })()}
+            </div>
             <div className="flex items-center gap-2">
               {game.running ? (
                 <button
@@ -271,13 +389,31 @@ export default function HostPage() {
           <Slider
             label={t.host.globalLoad}
             value={game.load}
-            min={50}
-            max={3000}
-            step={50}
+            min={0}
+            max={game.max_load ?? DEFAULT_GAME.max_load ?? 3000}
+            step={game.load_step ?? DEFAULT_GAME.load_step ?? 50}
             onChange={(v) => updateGame({ load: v })}
             unit="req/s"
             hint={t.host.loadHint}
           />
+
+          <div className="mt-3">
+            <button
+              onClick={() => {
+                if (!fluctuate) baseLoadRef.current = game.load;
+                setFluctuate((v) => !v);
+              }}
+              disabled={!game.running}
+              className={`flex items-center gap-1.5 px-3 py-1.5 border transition-colors text-xs font-jb disabled:opacity-40 disabled:cursor-not-allowed ${
+                fluctuate
+                  ? "border-amber-500 bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                  : "border-zinc-300 dark:border-zinc-700 hover:border-amber-500 text-zinc-500 dark:text-zinc-400"
+              }`}
+            >
+              <Zap size={12} />
+              {fluctuate ? "Fluctuate AN" : "Fluctuate AUS"} — Spikes 1×/s
+            </button>
+          </div>
 
           <div className="mt-4 grid grid-cols-3 gap-2 text-xs font-jb">
             <button

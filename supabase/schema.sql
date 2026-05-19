@@ -118,6 +118,37 @@ create
 policy "demo_all_teams" on public.teams
   for all using (true) with check (true);
 
+-- Load-History Snapshots (für den Beamer-Graph, persistent über Reloads)
+create table if not exists public.load_snapshots
+(
+    id          bigserial primary key,
+    game_id     uuid        not null references public.games (id) on delete cascade,
+    load        integer     not null,
+    recorded_at timestamptz not null default now()
+);
+
+create index if not exists load_snapshots_game_recorded_idx
+    on public.load_snapshots (game_id, recorded_at desc);
+
+do
+$$
+begin
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'load_snapshots'
+  ) then
+    alter publication supabase_realtime add table public.load_snapshots;
+  end if;
+end $$;
+
+alter table public.load_snapshots enable row level security;
+drop policy if exists "demo_all_load_snapshots" on public.load_snapshots;
+create policy "demo_all_load_snapshots" on public.load_snapshots
+    for all using (true) with check (true);
+
+grant select, insert, delete on public.load_snapshots to anon, authenticated;
+grant usage, select on sequence public.load_snapshots_id_seq to anon, authenticated;
+
 -- Optional helper: clear all teams (host can call this from the UI).
 create
 or replace function public.reset_game()
@@ -126,8 +157,8 @@ language plpgsql
 security definer
 as $$
 begin
-delete
-from public.teams;
+delete from public.teams;
+delete from public.load_snapshots;
 update public.games
 set load       = 300,
     running    = false,
@@ -143,6 +174,14 @@ grant execute on function public.reset_game
 -- Add wallet column to existing tables (idempotent).
 alter table public.teams
     add column if not exists wallet double precision not null default 100;
+
+-- Add configurable game settings (idempotent).
+alter table public.games
+    add column if not exists max_load integer not null default 3000;
+alter table public.games
+    add column if not exists load_step integer not null default 50;
+alter table public.games
+    add column if not exists game_duration integer not null default 360;
 
 -- Table-level privileges (required in addition to RLS policies).
 grant select, insert, update, delete on public.games to anon, authenticated;

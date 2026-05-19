@@ -19,10 +19,10 @@ import { Slider } from "@/components/Slider";
 import { Toggle } from "@/components/Toggle";
 import { Bar } from "@/components/Bar";
 import { ArchitectureViz } from "@/components/ArchitectureViz";
-import { computeMetrics, CONSTANTS } from "@/lib/simulation";
+import { computeMetrics, CONSTANTS, computeElapsed } from "@/lib/simulation";
 import { supabase, GAME_ID } from "@/lib/supabase";
 import { colorForName, fmt } from "@/lib/colors";
-import type { TeamConfig, GameRow, TeamRow } from "@/lib/types";
+import type { TeamConfig, GameRow, TeamRow, LoadSnapshot } from "@/lib/types";
 import { DEFAULT_CFG, DEFAULT_GAME } from "@/lib/defaults";
 import { useLang } from "@/lib/lang-context";
 
@@ -45,7 +45,14 @@ export default function TeamPage() {
   const [wallet, setWallet] = useState<number>(CONSTANTS.TEAM_BUDGET);
   const lastTickRef = useRef<number | null>(null);
   const cfgRef = useRef(cfg);
+  const gameRef = useRef<GameRow>(DEFAULT_GAME);
   const teamIdRef = useRef<string | null>(null);
+  const [now, setNow] = useState(Date.now());
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
 
   useEffect(() => {
     cfgRef.current = cfg;
@@ -53,6 +60,9 @@ export default function TeamPage() {
   useEffect(() => {
     teamIdRef.current = teamId;
   }, [teamId]);
+  useEffect(() => {
+    gameRef.current = game;
+  }, [game]);
 
   // ─── Session wiederherstellen nach Reload ─────────────────────────────────
   useEffect(() => {
@@ -175,7 +185,26 @@ export default function TeamPage() {
           filter: `id=eq.${GAME_ID}`,
         },
         (payload) => {
-          if (mounted && payload.new) setGame(payload.new as GameRow);
+          if (mounted && payload.new) {
+            const g = payload.new as GameRow;
+            gameRef.current = g;
+            setGame(g);
+          }
+        },
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "load_snapshots",
+          filter: `game_id=eq.${GAME_ID}`,
+        },
+        (payload) => {
+          if (!mounted || !payload.new) return;
+          const snap = payload.new as LoadSnapshot;
+          gameRef.current = { ...gameRef.current, load: snap.load };
+          setGame((prev) => ({ ...prev, load: snap.load }));
         },
       )
       .on(
@@ -215,9 +244,10 @@ export default function TeamPage() {
       const dt = (now - (lastTickRef.current ?? now)) / 1000;
       lastTickRef.current = now;
 
-      const liveMetrics = computeMetrics(cfgRef.current, game.load);
+      const g = gameRef.current;
+      const liveMetrics = computeMetrics(cfgRef.current, g.load);
       const liveBankrupt = walletRef.current <= 0;
-      const liveDeployed = !liveBankrupt && game.running;
+      const liveDeployed = !liveBankrupt && g.running;
 
       if (liveDeployed && dt > 0 && dt < 10) {
         scoreRef.current += liveMetrics.throughput * dt;
@@ -249,7 +279,7 @@ export default function TeamPage() {
     }, 1500);
 
     return () => clearInterval(interval);
-  }, [stage, teamId, game.load, game.running]);
+  }, [stage, teamId]);
 
   // ─── Registrierungs-Stage ─────────────────────────────────────────────────
   if (stage === "register") {
@@ -379,6 +409,25 @@ export default function TeamPage() {
               </div>
             </div>
           </div>
+          {game.started_at &&
+            (() => {
+              const gameDuration =
+                game.game_duration ??
+                DEFAULT_GAME.game_duration ??
+                CONSTANTS.GAME_DURATION;
+              const tl =
+                gameDuration -
+                computeElapsed(game.started_at, game.running, now);
+              const m = Math.floor(Math.max(0, tl) / 60);
+              const s = Math.floor(Math.max(0, tl) % 60);
+              return (
+                <div
+                  className={`text-sm font-jb tabular-nums ${tl < 60 ? "text-red-500 dark:text-red-400" : tl < 120 ? "text-amber-500 dark:text-amber-400" : "text-zinc-500 dark:text-zinc-400"}`}
+                >
+                  {`${m}:${s.toString().padStart(2, "0")}`}
+                </div>
+              );
+            })()}
           <Link
             href="/"
             className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 font-jb"

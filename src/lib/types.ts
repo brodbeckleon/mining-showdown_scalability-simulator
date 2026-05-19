@@ -16,6 +16,9 @@ export type GameRow = {
   running: boolean;
   started_at: string | null;
   created_at: string;
+  max_load?: number; // optional – Fallback auf DEFAULT_GAME wenn nicht in DB
+  load_step?: number; // optional – Fallback auf DEFAULT_GAME wenn nicht in DB
+  game_duration?: number; // Spielzeit in Sekunden, optional
 };
 
 export type TeamRow = {
@@ -36,6 +39,13 @@ export type TeamRow = {
   over_budget: boolean;
   last_seen: string;
   created_at: string;
+};
+
+export type LoadSnapshot = {
+  id: number;
+  game_id: string;
+  load: number;
+  recorded_at: string;
 };
 
 export type Metrics = {
