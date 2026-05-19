@@ -20,11 +20,11 @@ export function Toggle({ label, value, onChange, hint, disabled }: Props) {
           onClick={() => !disabled && onChange(!value)}
           disabled={disabled}
           aria-pressed={value}
-          className={`relative h-5 w-10 transition-colors ${value ? "bg-emerald-500" : "bg-zinc-300 dark:bg-zinc-700"}`}
+          className={`relative h-5 w-10 overflow-hidden transition-colors ${value ? "bg-emerald-500" : "bg-zinc-300 dark:bg-zinc-700"}`}
         >
           <span
-            className={`absolute top-0.5 h-4 w-4 bg-white dark:bg-zinc-950 transition-transform ${
-              value ? "translate-x-5" : "translate-x-0.5"
+            className={`absolute top-0.5 h-4 w-4 bg-white dark:bg-zinc-950 transition-all duration-200 ${
+              value ? "left-5" : "left-0.5"
             }`}
           />
         </button>
