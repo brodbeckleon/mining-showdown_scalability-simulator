@@ -207,6 +207,15 @@ export default function HostPage() {
     return () => clearInterval(id);
   }, [fluctuate, game.running]);
 
+  // ─── Steady-Snapshot: Graph läuft auch ohne Fluctuate weiter ─────────────
+  useEffect(() => {
+    if (fluctuate || !game.running) return;
+    const id = setInterval(() => {
+      writeSnapshot(baseLoadRef.current);
+    }, 1000);
+    return () => clearInterval(id);
+  }, [fluctuate, game.running]);
+
   const updateGame = async (patch: Partial<GameRow>) => {
     if ("load" in patch && patch.load !== undefined) {
       baseLoadRef.current = patch.load;
@@ -388,7 +397,11 @@ export default function HostPage() {
 
           <Slider
             label="Spielzeit"
-            value={game.game_duration ?? DEFAULT_GAME.game_duration ?? CONSTANTS.GAME_DURATION}
+            value={
+              game.game_duration ??
+              DEFAULT_GAME.game_duration ??
+              CONSTANTS.GAME_DURATION
+            }
             min={60}
             max={1200}
             step={60}
