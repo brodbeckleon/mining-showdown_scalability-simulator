@@ -374,7 +374,7 @@ export default function HostPage() {
                   onClick={startGame}
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-white dark:text-zinc-950 hover:bg-emerald-400 transition-colors text-xs font-jb"
                 >
-                  <Play size={12} /> Start
+                  <Play size={12} /> {game.started_at ? "Fortsetzen" : "Start"}
                 </button>
               )}
               <button
@@ -385,6 +385,18 @@ export default function HostPage() {
               </button>
             </div>
           </div>
+
+          <Slider
+            label="Spielzeit"
+            value={game.game_duration ?? DEFAULT_GAME.game_duration ?? CONSTANTS.GAME_DURATION}
+            min={60}
+            max={1200}
+            step={60}
+            onChange={(v) => updateGame({ game_duration: v })}
+            unit="s"
+            hint={`${Math.floor((game.game_duration ?? DEFAULT_GAME.game_duration ?? CONSTANTS.GAME_DURATION) / 60)} min`}
+            disabled={game.running || !!game.started_at}
+          />
 
           <Slider
             label={t.host.globalLoad}
