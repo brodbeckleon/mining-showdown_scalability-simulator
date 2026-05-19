@@ -9,11 +9,11 @@ import {
   Network,
   TrendingUp,
   ArrowLeft,
-  DollarSign,
   CheckCircle2,
   AlertTriangle,
   Trophy,
   Server,
+  Coins,
 } from "lucide-react";
 import { Slider } from "@/components/Slider";
 import { Toggle } from "@/components/Toggle";
@@ -411,48 +411,43 @@ export default function TeamPage() {
             <section className="border border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-900/30 p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <DollarSign
-                    size={13}
+                  <Coins
+                    size={18}
                     className="text-emerald-500 dark:text-emerald-400"
                   />
                   <h2 className="text-[11px] uppercase tracking-widest text-zinc-500 dark:text-zinc-400 font-jb">
-                    Wallet
+                    CHF Budget
                   </h2>
                 </div>
                 <span
                   className={`text-sm font-jb tabular-nums ${
-                    bankrupt || wallet < 20
+                    bankrupt || wallet < CONSTANTS.TEAM_BUDGET * 0.1
                       ? "text-red-500 dark:text-red-400"
-                      : wallet < 50
+                      : wallet < CONSTANTS.TEAM_BUDGET * 0.3
                         ? "text-amber-500 dark:text-amber-400"
-                        : wallet > 100
-                          ? "text-yellow-500 dark:text-yellow-300"
-                          : "text-emerald-500 dark:text-emerald-400"
+                        : "text-emerald-500 dark:text-emerald-400"
                   }`}
                 >
-                  {wallet.toFixed(1)} coins
+                  {wallet.toFixed(1)} CHF
                 </span>
               </div>
               <Bar
-                percent={Math.min(100, wallet)}
+                percent={(wallet / CONSTANTS.TEAM_BUDGET) * 100}
                 color={
-                  bankrupt || wallet < 20
+                  bankrupt || wallet < CONSTANTS.TEAM_BUDGET * 0.1
                     ? "bg-red-500"
-                    : wallet < 50
+                    : wallet < CONSTANTS.TEAM_BUDGET * 0.3
                       ? "bg-amber-500"
-                      : wallet > 100
-                        ? "bg-amber-400"
-                        : "bg-emerald-500"
+                      : "bg-emerald-500"
                 }
-                criticalAt={101}
-                goldOverflow={wallet > 100}
               />
               {game.running && !bankrupt && (
                 <div
                   className={`text-[10px] font-jb tabular-nums ${earnRate >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-500 dark:text-red-400"}`}
                 >
                   {earnRate >= 0 ? "+" : ""}
-                  {earnRate.toFixed(3)}/s · Infra ${metrics.cost.toFixed(0)}/h
+                  {earnRate.toFixed(3)} CHF/s · Infra {metrics.cost.toFixed(0)}{" "}
+                  CHF/h
                 </div>
               )}
             </section>
@@ -585,7 +580,7 @@ export default function TeamPage() {
             ) : (
               <section className="border-2 p-5" style={{ borderColor: color }}>
                 <div className="text-[10px] uppercase tracking-widest text-zinc-500 font-jb mb-1">
-                  Score
+                  Coins Mined
                 </div>
                 <div
                   className="text-4xl font-jb tabular-nums"

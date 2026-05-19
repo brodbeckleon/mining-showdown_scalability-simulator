@@ -130,7 +130,7 @@ export default function BeamerPage() {
                 {game.load}
               </div>
               <div className="text-xs text-zinc-500 font-jb">
-                req/s · {t.beamer.startWallet} {CONSTANTS.TEAM_BUDGET} Coins
+                req/s · {t.beamer.startWallet} {CONSTANTS.TEAM_BUDGET} CHF
               </div>
             </div>
             <button
@@ -321,7 +321,7 @@ export default function BeamerPage() {
                         <div
                           className={`text-[10px] font-jb tabular-nums ${(tm.wallet ?? 100) < 20 ? "text-amber-500 dark:text-amber-400" : "text-zinc-400 dark:text-zinc-600"}`}
                         >
-                          {(tm.wallet ?? 100).toFixed(0)} coins
+                          {(tm.wallet ?? 100).toFixed(0)} CHF
                         </div>
                       </div>
                     </div>

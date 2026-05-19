@@ -16,9 +16,9 @@ export const CONSTANTS = {
   COST_GB_RAM: 2, // $/h pro GB
   COST_LB: 12, // $/h für Load Balancer
   COST_SHARD: 9, // $/h pro Shard
-  TEAM_BUDGET: 80, // Startkapital (Coins)
-  EARN_RATE: 0.006, // Coins pro erfolgreich verarbeitetem Request
-  SPEND_RATE: 0.01, // Coins pro $/h Infrastruktur pro Sekunde
+  TEAM_BUDGET: 80, // Startkapital CHF-Budget
+  EARN_RATE: 0.006, // Coins pro erfolgreich verarbeitetem Request (Mining)
+  SPEND_RATE: 0.01, // CHF pro $/h Infrastruktur pro Sekunde
 } as const;
 
 export function computeMetrics(cfg: TeamConfig, load: number): Metrics {
