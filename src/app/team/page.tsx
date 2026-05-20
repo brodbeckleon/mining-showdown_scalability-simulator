@@ -361,6 +361,15 @@ export default function TeamPage() {
   );
   const myRank = sortedTeams.findIndex((tm) => tm.id === teamId) + 1;
 
+  const gameDuration =
+    game.game_duration ??
+    DEFAULT_GAME.game_duration ??
+    CONSTANTS.GAME_DURATION;
+  const timeLeft = game.started_at
+    ? gameDuration - computeElapsed(game.started_at, game.running, now)
+    : null;
+  const gameOver = timeLeft !== null && timeLeft <= 0;
+
   // suppress unused warning
   void deployed;
 
@@ -388,6 +397,50 @@ export default function TeamPage() {
 
   return (
     <main className="min-h-screen p-3 md:p-5">
+      {/* ─── Game Over Overlay ────────────────────────────────────────────── */}
+      {gameOver && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/70 dark:bg-zinc-950/80 backdrop-blur-sm p-6">
+          <div
+            className="w-full max-w-sm border-2 bg-white dark:bg-zinc-950 p-8 text-center"
+            style={{ borderColor: color }}
+          >
+            <Trophy
+              size={40}
+              className="mx-auto mb-4 text-amber-400"
+            />
+            <div className="text-[10px] uppercase tracking-widest text-zinc-500 font-jb mb-1">
+              {t.team.gameOverTitle}
+            </div>
+            <div className="text-sm font-semibold mb-5">{teamName}</div>
+
+            <div className="text-[10px] uppercase tracking-widest text-zinc-500 font-jb mb-1">
+              {t.team.finalPlacement}
+            </div>
+            <div
+              className="text-6xl font-jb tabular-nums mb-1"
+              style={{ color }}
+            >
+              #{myRank > 0 ? myRank : "—"}
+            </div>
+            <div className="text-xs text-zinc-500 font-jb mb-6">
+              {t.team.of} {allTeams.length} {t.team.participants}
+            </div>
+
+            <div className="border-t border-zinc-200 dark:border-zinc-800 pt-4">
+              <div className="text-[10px] uppercase tracking-widest text-zinc-500 font-jb mb-1">
+                {t.team.finalScore}
+              </div>
+              <div
+                className="text-2xl font-jb tabular-nums"
+                style={{ color }}
+              >
+                {fmt(score)}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <header className="flex items-center justify-between mb-4 pb-3 border-b border-zinc-200 dark:border-zinc-800">
@@ -409,22 +462,16 @@ export default function TeamPage() {
               </div>
             </div>
           </div>
-          {game.started_at &&
+          {timeLeft !== null &&
             (() => {
-              const gameDuration =
-                game.game_duration ??
-                DEFAULT_GAME.game_duration ??
-                CONSTANTS.GAME_DURATION;
-              const tl =
-                gameDuration -
-                computeElapsed(game.started_at, game.running, now);
+              const tl = timeLeft;
               const m = Math.floor(Math.max(0, tl) / 60);
               const s = Math.floor(Math.max(0, tl) % 60);
               return (
                 <div
-                  className={`text-sm font-jb tabular-nums ${tl < 60 ? "text-red-500 dark:text-red-400" : tl < 120 ? "text-amber-500 dark:text-amber-400" : "text-zinc-500 dark:text-zinc-400"}`}
+                  className={`text-sm font-jb tabular-nums ${tl <= 0 ? "text-zinc-400 dark:text-zinc-600" : tl < 60 ? "text-red-500 dark:text-red-400" : tl < 120 ? "text-amber-500 dark:text-amber-400" : "text-zinc-500 dark:text-zinc-400"}`}
                 >
-                  {`${m}:${s.toString().padStart(2, "0")}`}
+                  {tl <= 0 ? "0:00" : `${m}:${s.toString().padStart(2, "0")}`}
                 </div>
               );
             })()}
@@ -456,7 +503,7 @@ export default function TeamPage() {
 
         <div className="grid lg:grid-cols-12 gap-4">
           {/* ─── Linke Spalte: Konfiguration ─────────────────────────── */}
-          <div className="lg:col-span-4 space-y-3">
+          <div className={`lg:col-span-4 space-y-3 ${gameOver ? "pointer-events-none opacity-40" : ""}`}>
             <section className="border border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-900/30 p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">

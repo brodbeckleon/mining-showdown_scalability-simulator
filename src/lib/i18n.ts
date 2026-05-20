@@ -101,6 +101,11 @@ export const translations = {
       infraOffline: "Infrastruktur offline",
       finalScore: "Endstand",
       throughput: "Throughput",
+      gameOverTitle: "Spiel beendet!",
+      finalPlacement: "Endplatzierung",
+      of: "von",
+      participants: "Teilnehmer",
+      lockedHint: "Die Konfiguration ist gesperrt.",
     },
     strategyPanel: {
       title: "Skalierungsstrategien",
@@ -204,6 +209,11 @@ export const translations = {
       infraOffline: "Infrastructure offline",
       finalScore: "Final Score",
       throughput: "Throughput",
+      gameOverTitle: "Game Over!",
+      finalPlacement: "Final Placement",
+      of: "of",
+      participants: "Participants",
+      lockedHint: "Configuration is locked.",
     },
     strategyPanel: {
       title: "Scaling Strategies",
