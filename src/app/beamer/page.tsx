@@ -129,18 +129,48 @@ export default function BeamerPage() {
       .on(
         "postgres_changes",
         {
-          event: "*",
+          event: "INSERT",
           schema: "public",
           table: "teams",
           filter: `game_id=eq.${GAME_ID}`,
         },
-        () => {
-          sb.from("teams")
-            .select("*")
-            .eq("game_id", GAME_ID)
-            .then(({ data }) => {
-              if (mounted && data) setTeams(data as TeamRow[]);
-            });
+        (payload) => {
+          if (mounted && payload.new)
+            setTeams((prev) => [...prev, payload.new as TeamRow]);
+        },
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "teams",
+          filter: `game_id=eq.${GAME_ID}`,
+        },
+        (payload) => {
+          if (mounted && payload.new)
+            setTeams((prev) =>
+              prev.map((t) =>
+                t.id === (payload.new as TeamRow).id
+                  ? (payload.new as TeamRow)
+                  : t,
+              ),
+            );
+        },
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "DELETE",
+          schema: "public",
+          table: "teams",
+          filter: `game_id=eq.${GAME_ID}`,
+        },
+        (payload) => {
+          if (mounted && payload.old)
+            setTeams((prev) =>
+              prev.filter((t) => t.id !== (payload.old as TeamRow).id),
+            );
         },
       )
       .subscribe();
