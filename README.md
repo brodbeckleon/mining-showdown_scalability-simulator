@@ -99,7 +99,7 @@ wallet += (throughput × EARN_RATE) - (infra_cost × SPEND_RATE)
 | `EARN_RATE`   | 0.006 coins per processed request            |
 | `SPEND_RATE`  | 0.01 coins per $/h infrastructure per second |
 | `COST_CORE`   | $6/h per CPU core                            |
-| `COST_GB_RAM` | $4/h per GB RAM                              |
+| `COST_GB_RAM` | $2/h per GB RAM                              |
 | `COST_LB`     | $12/h flat                                   |
 | `COST_SHARD`  | $9/h per shard                               |
 
@@ -147,13 +147,29 @@ dropped    = load - throughput
 | Bottleneck | utilization ≥ 95% | Red       |
 | None       | utilization ≤ 70% | Green     |
 
+### Timer & Game Duration
+
+The host sets the game duration via a slider (60–1200 s, default **360 s / 6 min**) before starting.
+Once the game is running the slider is locked. A countdown is visible on both the Host Console and the Beamer.
+
+The timer supports **pause/resume**: elapsed seconds are encoded into `started_at` as a Unix-epoch offset so the state survives page reloads.
+
+When time runs out the game stops automatically and teams see a **Game Over overlay** with their final score and placement. The Beamer switches to a **Final Results** view.
+
+### Host Load Controls
+
+| Control           | Description                                                      |
+| ----------------- | ---------------------------------------------------------------- |
+| Load Slider       | Sets global req/s (0–3000, step 50 by default)                  |
+| **Fluctuate** toggle | Randomizes load every second: spikes (1.8×–3×), dips (30–60%), or ±25% noise. Only active while the game is running. |
+
 ### Host Load Phases (preset buttons)
 
-| Phase   | Load       |
-| ------- | ---------- |
-| Phase 1 | 200 req/s  |
-| Phase 2 | 800 req/s  |
-| Phase 3 | 1800 req/s |
+| Phase   | Load       | Label  |
+| ------- | ---------- | ------ |
+| Phase 1 | 200 req/s  | easy   |
+| Phase 2 | 800 req/s  | brutal |
+| Phase 3 | 1800 req/s | chaos  |
 
 ---
 
@@ -181,11 +197,14 @@ Two tables are required:
 **`games`**
 
 ```sql
-id          uuid primary key
-load        integer
-running     boolean
-started_at  timestamptz
-created_at  timestamptz
+id            uuid primary key
+load          integer
+running       boolean
+started_at    timestamptz
+created_at    timestamptz
+game_duration integer          -- optional, seconds (default 360)
+max_load      integer          -- optional, slider max (default 3000)
+load_step     integer          -- optional, slider step (default 50)
 ```
 
 **`teams`**
@@ -210,7 +229,18 @@ last_seen      timestamptz
 created_at     timestamptz
 ```
 
-Enable Realtime on both tables in the Supabase dashboard.
+**`load_snapshots`**
+
+```sql
+id           bigserial primary key
+game_id      uuid references games(id)
+load         integer
+recorded_at  timestamptz default now()
+```
+
+Used by the Beamer to render the live load history graph (last 120 data points).
+
+Enable Realtime on `games` and `teams` in the Supabase dashboard (`load_snapshots` is polled on initial load only).
 
 ---
 
