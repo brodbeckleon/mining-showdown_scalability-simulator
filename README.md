@@ -158,9 +158,9 @@ When time runs out the game stops automatically and teams see a **Game Over over
 
 ### Host Load Controls
 
-| Control           | Description                                                      |
-| ----------------- | ---------------------------------------------------------------- |
-| Load Slider       | Sets global req/s (0–3000, step 50 by default)                  |
+| Control              | Description                                                                                                          |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Load Slider          | Sets global req/s (0–3000, step 50 by default)                                                                       |
 | **Fluctuate** toggle | Randomizes load every second: spikes (1.8×–3×), dips (30–60%), or ±25% noise. Only active while the game is running. |
 
 ### Host Load Phases (preset buttons)

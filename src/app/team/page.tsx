@@ -362,9 +362,7 @@ export default function TeamPage() {
   const myRank = sortedTeams.findIndex((tm) => tm.id === teamId) + 1;
 
   const gameDuration =
-    game.game_duration ??
-    DEFAULT_GAME.game_duration ??
-    CONSTANTS.GAME_DURATION;
+    game.game_duration ?? DEFAULT_GAME.game_duration ?? CONSTANTS.GAME_DURATION;
   const timeLeft = game.started_at
     ? gameDuration - computeElapsed(game.started_at, game.running, now)
     : null;
@@ -404,10 +402,7 @@ export default function TeamPage() {
             className="w-full max-w-sm border-2 bg-white dark:bg-zinc-950 p-8 text-center"
             style={{ borderColor: color }}
           >
-            <Trophy
-              size={40}
-              className="mx-auto mb-4 text-amber-400"
-            />
+            <Trophy size={40} className="mx-auto mb-4 text-amber-400" />
             <div className="text-[10px] uppercase tracking-widest text-zinc-500 font-jb mb-1">
               {t.team.gameOverTitle}
             </div>
@@ -430,10 +425,7 @@ export default function TeamPage() {
               <div className="text-[10px] uppercase tracking-widest text-zinc-500 font-jb mb-1">
                 {t.team.finalScore}
               </div>
-              <div
-                className="text-2xl font-jb tabular-nums"
-                style={{ color }}
-              >
+              <div className="text-2xl font-jb tabular-nums" style={{ color }}>
                 {fmt(score)}
               </div>
             </div>
@@ -503,7 +495,9 @@ export default function TeamPage() {
 
         <div className="grid lg:grid-cols-12 gap-4">
           {/* ─── Linke Spalte: Konfiguration ─────────────────────────── */}
-          <div className={`lg:col-span-4 space-y-3 ${gameOver ? "pointer-events-none opacity-40" : ""}`}>
+          <div
+            className={`lg:col-span-4 space-y-3 ${gameOver ? "pointer-events-none opacity-40" : ""}`}
+          >
             <section className="border border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-900/30 p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
