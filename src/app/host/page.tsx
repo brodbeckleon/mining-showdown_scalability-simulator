@@ -95,7 +95,7 @@ export default function HostPage() {
 
   const [game, setGame] = useState<GameRow>(DEFAULT_GAME);
   const [teams, setTeams] = useState<TeamRow[]>([]);
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState(() => Date.now());
   const [fluctuate, setFluctuate] = useState(false);
   const gameRef = useRef(game);
   const fluctuateRef = useRef(fluctuate);

@@ -166,7 +166,7 @@ export default function SessionPage() {
   // Game state
   const [game, setGame] = useState<GameRow>(DEFAULT_SESSION_GAME);
   const [teams, setTeams] = useState<TeamRow[]>([]);
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState(() => Date.now());
   const [fluctuate, setFluctuate] = useState(false);
   const [loadHistory, setLoadHistory] = useState<number[]>([]);
 

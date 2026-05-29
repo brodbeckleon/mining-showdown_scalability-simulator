@@ -58,7 +58,7 @@ export default function JoinPage() {
   const [game, setGame] = useState<GameRow>(DEFAULT_SESSION_GAME);
   const [allTeams, setAllTeams] = useState<TeamRow[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState(() => Date.now());
 
   const scoreRef = useRef(0);
   const [score, setScore] = useState(0);

@@ -35,7 +35,7 @@ export default function BeamerPage() {
   const gameRef = useRef<GameRow>(DEFAULT_GAME);
   const [teams, setTeams] = useState<TeamRow[]>([]);
   const [showStrategies, setShowStrategies] = useState(false);
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState(() => Date.now());
   const [loadHistory, setLoadHistory] = useState<number[]>([]);
 
   // ─── Timer-Tick (1s) — nur für die Uhr, kein DB-Polling ─────────────────

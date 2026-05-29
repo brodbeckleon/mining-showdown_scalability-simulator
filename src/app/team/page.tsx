@@ -47,7 +47,7 @@ export default function TeamPage() {
   const cfgRef = useRef(cfg);
   const gameRef = useRef<GameRow>(DEFAULT_GAME);
   const teamIdRef = useRef<string | null>(null);
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
