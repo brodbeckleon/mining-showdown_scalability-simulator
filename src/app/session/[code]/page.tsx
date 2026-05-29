@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  useState,
-  useEffect,
-  useRef,
-  useCallback,
-  useMemo,
-} from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { QRCodeSVG } from "qrcode.react";
@@ -61,9 +55,13 @@ function formatTime(seconds: number): string {
 
 function fluctuateLoad(base: number): number {
   const r = Math.random();
-  if (r < 0.08) return Math.round(Math.min(3000, base * (1.8 + Math.random() * 1.2)));
-  if (r < 0.15) return Math.round(Math.max(50, base * (0.3 + Math.random() * 0.3)));
-  return Math.round(Math.max(50, Math.min(3000, base * (0.75 + Math.random() * 0.5))));
+  if (r < 0.08)
+    return Math.round(Math.min(3000, base * (1.8 + Math.random() * 1.2)));
+  if (r < 0.15)
+    return Math.round(Math.max(50, base * (0.3 + Math.random() * 0.3)));
+  return Math.round(
+    Math.max(50, Math.min(3000, base * (0.75 + Math.random() * 0.5))),
+  );
 }
 
 // ─── Share Modal ────────────────────────────────────────────────────────────
@@ -178,8 +176,12 @@ export default function SessionPage() {
   const baseLoadRef = useRef(0);
   const gameIdRef = useRef<string | null>(null);
 
-  useEffect(() => { gameRef.current = game; }, [game]);
-  useEffect(() => { fluctuateRef.current = fluctuate; }, [fluctuate]);
+  useEffect(() => {
+    gameRef.current = game;
+  }, [game]);
+  useEffect(() => {
+    fluctuateRef.current = fluctuate;
+  }, [fluctuate]);
 
   // ─── Resolve code → gameId ─────────────────────────────────────────────
   useEffect(() => {
@@ -222,9 +224,12 @@ export default function SessionPage() {
     const sb = supabase();
 
     // Load initial teams + snapshots
-    sb.from("teams").select("*").eq("game_id", gameId).then(({ data }) => {
-      if (mounted && data) setTeams(data as TeamRow[]);
-    });
+    sb.from("teams")
+      .select("*")
+      .eq("game_id", gameId)
+      .then(({ data }) => {
+        if (mounted && data) setTeams(data as TeamRow[]);
+      });
     sb.from("load_snapshots")
       .select("load")
       .eq("game_id", gameId)
@@ -240,7 +245,12 @@ export default function SessionPage() {
       .channel(`session-${gameId}`)
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "games", filter: `id=eq.${gameId}` },
+        {
+          event: "*",
+          schema: "public",
+          table: "games",
+          filter: `id=eq.${gameId}`,
+        },
         (payload) => {
           if (!mounted || !payload.new) return;
           const g = payload.new as GameRow;
@@ -250,7 +260,12 @@ export default function SessionPage() {
       )
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "load_snapshots", filter: `game_id=eq.${gameId}` },
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "load_snapshots",
+          filter: `game_id=eq.${gameId}`,
+        },
         (payload) => {
           if (!mounted || !payload.new) return;
           const snap = payload.new as LoadSnapshot;
@@ -258,33 +273,57 @@ export default function SessionPage() {
           setGame((prev) => ({ ...prev, load: snap.load }));
           setLoadHistory((prev) => {
             const next = [...prev, snap.load];
-            return next.length > GRAPH_POINTS ? next.slice(-GRAPH_POINTS) : next;
+            return next.length > GRAPH_POINTS
+              ? next.slice(-GRAPH_POINTS)
+              : next;
           });
         },
       )
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "teams", filter: `game_id=eq.${gameId}` },
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "teams",
+          filter: `game_id=eq.${gameId}`,
+        },
         (payload) => {
-          if (mounted && payload.new) setTeams((prev) => [...prev, payload.new as TeamRow]);
+          if (mounted && payload.new)
+            setTeams((prev) => [...prev, payload.new as TeamRow]);
         },
       )
       .on(
         "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "teams", filter: `game_id=eq.${gameId}` },
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "teams",
+          filter: `game_id=eq.${gameId}`,
+        },
         (payload) => {
           if (mounted && payload.new)
             setTeams((prev) =>
-              prev.map((t) => (t.id === (payload.new as TeamRow).id ? (payload.new as TeamRow) : t)),
+              prev.map((t) =>
+                t.id === (payload.new as TeamRow).id
+                  ? (payload.new as TeamRow)
+                  : t,
+              ),
             );
         },
       )
       .on(
         "postgres_changes",
-        { event: "DELETE", schema: "public", table: "teams", filter: `game_id=eq.${gameId}` },
+        {
+          event: "DELETE",
+          schema: "public",
+          table: "teams",
+          filter: `game_id=eq.${gameId}`,
+        },
         (payload) => {
           if (mounted && payload.old)
-            setTeams((prev) => prev.filter((t) => t.id !== (payload.old as TeamRow).id));
+            setTeams((prev) =>
+              prev.filter((t) => t.id !== (payload.old as TeamRow).id),
+            );
         },
       )
       .subscribe();
@@ -321,7 +360,10 @@ export default function SessionPage() {
   const writeSnapshot = useCallback(
     (load: number) => {
       if (!gameId) return;
-      supabase().from("load_snapshots").insert({ game_id: gameId, load }).then();
+      supabase()
+        .from("load_snapshots")
+        .insert({ game_id: gameId, load })
+        .then();
     },
     [gameId],
   );
@@ -385,11 +427,19 @@ export default function SessionPage() {
 
   const handleReset = async () => {
     if (!gameId) return;
-    if (!window.confirm("Reset this session? All teams and scores will be cleared.")) return;
+    if (
+      !window.confirm(
+        "Reset this session? All teams and scores will be cleared.",
+      )
+    )
+      return;
     const sb = supabase();
     await sb.from("teams").delete().eq("game_id", gameId);
     await sb.from("load_snapshots").delete().eq("game_id", gameId);
-    await sb.from("games").update({ load: 0, running: false, started_at: null }).eq("id", gameId);
+    await sb
+      .from("games")
+      .update({ load: 0, running: false, started_at: null })
+      .eq("id", gameId);
     setGame((prev) => ({ ...prev, load: 0, running: false, started_at: null }));
     setTeams([]);
     setLoadHistory([]);
@@ -402,14 +452,17 @@ export default function SessionPage() {
   };
 
   // ─── Derived values ───────────────────────────────────────────────────
-  const sortedTeams = [...teams].sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+  const sortedTeams = [...teams].sort(
+    (a, b) => (b.score ?? 0) - (a.score ?? 0),
+  );
   const maxScore = Math.max(1, ...sortedTeams.map((tm) => tm.score ?? 0));
   const champion = sortedTeams[0];
 
   const gameDuration = game.game_duration ?? 360;
   const elapsed = computeElapsed(game.started_at, game.running, now);
   const timeLeft = gameDuration - elapsed;
-  const gameEnded = !game.running && !!game.started_at && elapsed >= gameDuration;
+  const gameEnded =
+    !game.running && !!game.started_at && elapsed >= gameDuration;
 
   const graphMax = Math.max(1, ...loadHistory);
   const graphPoints = loadHistory
@@ -529,7 +582,8 @@ export default function SessionPage() {
                         onClick={startGame}
                         className="flex items-center gap-1 px-2.5 py-1.5 bg-emerald-500 text-white dark:text-zinc-950 hover:bg-emerald-400 transition-colors text-xs font-jb"
                       >
-                        <Play size={11} /> {game.started_at ? "Resume" : "Start"}
+                        <Play size={11} />{" "}
+                        {game.started_at ? "Resume" : "Start"}
                       </button>
                     )}
                     <button
@@ -585,9 +639,27 @@ export default function SessionPage() {
 
                   <div className="mt-3 grid grid-cols-3 gap-1.5 text-xs font-jb">
                     {[
-                      { load: 200, label: "Phase 1", sub: "200 req/s", color: "text-emerald-500 dark:text-emerald-400", hover: "hover:border-emerald-500" },
-                      { load: 800, label: "Phase 2", sub: "800 req/s", color: "text-amber-500 dark:text-amber-400", hover: "hover:border-amber-500" },
-                      { load: 1800, label: "Phase 3", sub: "1800 req/s", color: "text-red-500 dark:text-red-400", hover: "hover:border-red-500" },
+                      {
+                        load: 200,
+                        label: "Phase 1",
+                        sub: "200 req/s",
+                        color: "text-emerald-500 dark:text-emerald-400",
+                        hover: "hover:border-emerald-500",
+                      },
+                      {
+                        load: 800,
+                        label: "Phase 2",
+                        sub: "800 req/s",
+                        color: "text-amber-500 dark:text-amber-400",
+                        hover: "hover:border-amber-500",
+                      },
+                      {
+                        load: 1800,
+                        label: "Phase 3",
+                        sub: "1800 req/s",
+                        color: "text-red-500 dark:text-red-400",
+                        hover: "hover:border-red-500",
+                      },
                     ].map((p) => (
                       <button
                         key={p.load}
@@ -609,7 +681,9 @@ export default function SessionPage() {
                 <Users size={12} /> {t.host.connectedTeams} ({teams.length})
               </h2>
               {sortedTeams.length === 0 ? (
-                <p className="text-xs text-zinc-500 font-jb">{t.host.noTeams}</p>
+                <p className="text-xs text-zinc-500 font-jb">
+                  {t.host.noTeams}
+                </p>
               ) : (
                 <div className="space-y-1">
                   {sortedTeams.map((tm, i) => {
@@ -619,15 +693,26 @@ export default function SessionPage() {
                         key={tm.id}
                         className="flex items-center gap-2 text-xs font-jb py-1.5 border-b border-zinc-200/50 dark:border-zinc-800/50"
                       >
-                        <span className="w-4 text-zinc-500 tabular-nums">#{i + 1}</span>
-                        <span className="w-2 h-2 shrink-0" style={{ background: tm.color }} />
+                        <span className="w-4 text-zinc-500 tabular-nums">
+                          #{i + 1}
+                        </span>
+                        <span
+                          className="w-2 h-2 shrink-0"
+                          style={{ background: tm.color }}
+                        />
                         <span className="flex-1 truncate text-zinc-700 dark:text-zinc-200 text-[11px]">
                           {tm.name}
                         </span>
                         {stale ? (
-                          <WifiOff size={10} className="text-zinc-400 dark:text-zinc-600" />
+                          <WifiOff
+                            size={10}
+                            className="text-zinc-400 dark:text-zinc-600"
+                          />
                         ) : (
-                          <Wifi size={10} className="text-emerald-500 dark:text-emerald-400" />
+                          <Wifi
+                            size={10}
+                            className="text-emerald-500 dark:text-emerald-400"
+                          />
                         )}
                         <span className="tabular-nums text-zinc-700 dark:text-zinc-300 text-[11px]">
                           {fmt(tm.score)}
@@ -660,12 +745,18 @@ export default function SessionPage() {
                   <span
                     className={`text-xs uppercase tracking-[0.4em] font-jb ${game.running ? "text-emerald-500 dark:text-emerald-400" : gameEnded ? "text-amber-500 dark:text-amber-400" : "text-zinc-400 dark:text-zinc-600"}`}
                   >
-                    {gameEnded ? "GAME OVER" : game.running ? t.beamer.live : t.beamer.waiting}
+                    {gameEnded
+                      ? "GAME OVER"
+                      : game.running
+                        ? t.beamer.live
+                        : t.beamer.waiting}
                   </span>
                 </div>
                 <h1 className="text-4xl lg:text-5xl font-bold tracking-tight">
                   MINING{" "}
-                  <span className="text-emerald-500 dark:text-emerald-400">SHOWDOWN</span>
+                  <span className="text-emerald-500 dark:text-emerald-400">
+                    SHOWDOWN
+                  </span>
                 </h1>
               </div>
 
@@ -719,7 +810,9 @@ export default function SessionPage() {
                   <div className="text-3xl font-jb tabular-nums text-amber-500 dark:text-amber-400">
                     {game.load}
                   </div>
-                  <div className="text-xs text-zinc-500 font-jb mt-0.5">req/s</div>
+                  <div className="text-xs text-zinc-500 font-jb mt-0.5">
+                    req/s
+                  </div>
                 </div>
                 {loadHistory.length > 2 && (
                   <div className="flex-1">
@@ -727,24 +820,41 @@ export default function SessionPage() {
                       <span>←120s</span>
                       <span>{graphMax} req/s</span>
                     </div>
-                    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-14">
+                    <svg
+                      viewBox="0 0 100 100"
+                      preserveAspectRatio="none"
+                      className="w-full h-14"
+                    >
                       <line
-                        x1="0" y1="52.5" x2="100" y2="52.5"
-                        stroke="currentColor" strokeWidth="0.5"
+                        x1="0"
+                        y1="52.5"
+                        x2="100"
+                        y2="52.5"
+                        stroke="currentColor"
+                        strokeWidth="0.5"
                         className="text-zinc-300 dark:text-zinc-700"
                         vectorEffect="non-scaling-stroke"
                       />
                       <polyline
                         points={graphPoints}
-                        fill="none" stroke="#f59e0b" strokeWidth="2"
+                        fill="none"
+                        stroke="#f59e0b"
+                        strokeWidth="2"
                         vectorEffect="non-scaling-stroke"
-                        strokeLinejoin="round" strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeLinecap="round"
                       />
                       {loadHistory.length > 0 && (
                         <circle
                           cx="100"
-                          cy={100 - (loadHistory[loadHistory.length - 1] / graphMax) * 95}
-                          r="2" fill="#f59e0b" vectorEffect="non-scaling-stroke"
+                          cy={
+                            100 -
+                            (loadHistory[loadHistory.length - 1] / graphMax) *
+                              95
+                          }
+                          r="2"
+                          fill="#f59e0b"
+                          vectorEffect="non-scaling-stroke"
                         />
                       )}
                     </svg>
@@ -756,30 +866,56 @@ export default function SessionPage() {
             {/* Empty state / Game Over / Live leaderboard */}
             {sortedTeams.length === 0 ? (
               <div className="text-center py-24">
-                <Users size={40} className="text-zinc-300 dark:text-zinc-700 mx-auto mb-3 animate-pulse" />
-                <div className="text-xl text-zinc-400 dark:text-zinc-600 font-jb">{t.beamer.waitingTeams}</div>
-                <div className="text-xs text-zinc-400 dark:text-zinc-700 mt-2 font-jb">{t.beamer.waitingHint}</div>
+                <Users
+                  size={40}
+                  className="text-zinc-300 dark:text-zinc-700 mx-auto mb-3 animate-pulse"
+                />
+                <div className="text-xl text-zinc-400 dark:text-zinc-600 font-jb">
+                  {t.beamer.waitingTeams}
+                </div>
+                <div className="text-xs text-zinc-400 dark:text-zinc-700 mt-2 font-jb">
+                  {t.beamer.waitingHint}
+                </div>
               </div>
             ) : gameEnded ? (
               <>
                 <div className="text-center mb-6">
                   <div className="flex items-center justify-center gap-2 mb-1">
-                    <Trophy size={18} className="text-amber-500 dark:text-amber-400" />
+                    <Trophy
+                      size={18}
+                      className="text-amber-500 dark:text-amber-400"
+                    />
                     <span className="text-xs uppercase tracking-[0.4em] text-amber-500 dark:text-amber-400 font-jb">
                       Final Results
                     </span>
-                    <Trophy size={18} className="text-amber-500 dark:text-amber-400" />
+                    <Trophy
+                      size={18}
+                      className="text-amber-500 dark:text-amber-400"
+                    />
                   </div>
                 </div>
 
                 {/* Podium */}
                 <div className="flex items-end justify-center gap-3 mb-6">
                   {sortedTeams[1] && (
-                    <div className="flex-1 max-w-xs border-2 p-4 text-center" style={{ borderColor: sortedTeams[1].color }}>
-                      <div className="text-xl font-bold font-jb text-zinc-400 dark:text-zinc-500 mb-1">#2</div>
-                      <div className="w-2.5 h-2.5 mx-auto mb-1.5" style={{ background: sortedTeams[1].color }} />
-                      <div className="text-lg font-semibold truncate">{sortedTeams[1].name}</div>
-                      <div className="text-2xl font-bold font-jb tabular-nums mt-1" style={{ color: sortedTeams[1].color }}>
+                    <div
+                      className="flex-1 max-w-xs border-2 p-4 text-center"
+                      style={{ borderColor: sortedTeams[1].color }}
+                    >
+                      <div className="text-xl font-bold font-jb text-zinc-400 dark:text-zinc-500 mb-1">
+                        #2
+                      </div>
+                      <div
+                        className="w-2.5 h-2.5 mx-auto mb-1.5"
+                        style={{ background: sortedTeams[1].color }}
+                      />
+                      <div className="text-lg font-semibold truncate">
+                        {sortedTeams[1].name}
+                      </div>
+                      <div
+                        className="text-2xl font-bold font-jb tabular-nums mt-1"
+                        style={{ color: sortedTeams[1].color }}
+                      >
                         {fmt(sortedTeams[1].score)}
                       </div>
                       <div className="text-[9px] text-zinc-500 font-jb mt-0.5">
@@ -790,13 +926,33 @@ export default function SessionPage() {
                   {sortedTeams[0] && (
                     <div
                       className="flex-1 max-w-sm border-2 p-5 text-center relative overflow-hidden"
-                      style={{ borderColor: sortedTeams[0].color, background: `linear-gradient(180deg, ${sortedTeams[0].color}20, transparent)` }}
+                      style={{
+                        borderColor: sortedTeams[0].color,
+                        background: `linear-gradient(180deg, ${sortedTeams[0].color}20, transparent)`,
+                      }}
                     >
-                      <Crown size={18} className="mx-auto mb-1.5" style={{ color: sortedTeams[0].color }} />
-                      <div className="text-3xl font-bold font-jb mb-1.5" style={{ color: sortedTeams[0].color }}>#1</div>
-                      <div className="w-3 h-3 mx-auto mb-1.5" style={{ background: sortedTeams[0].color }} />
-                      <div className="text-xl font-semibold truncate">{sortedTeams[0].name}</div>
-                      <div className="text-4xl font-bold font-jb tabular-nums mt-1.5" style={{ color: sortedTeams[0].color }}>
+                      <Crown
+                        size={18}
+                        className="mx-auto mb-1.5"
+                        style={{ color: sortedTeams[0].color }}
+                      />
+                      <div
+                        className="text-3xl font-bold font-jb mb-1.5"
+                        style={{ color: sortedTeams[0].color }}
+                      >
+                        #1
+                      </div>
+                      <div
+                        className="w-3 h-3 mx-auto mb-1.5"
+                        style={{ background: sortedTeams[0].color }}
+                      />
+                      <div className="text-xl font-semibold truncate">
+                        {sortedTeams[0].name}
+                      </div>
+                      <div
+                        className="text-4xl font-bold font-jb tabular-nums mt-1.5"
+                        style={{ color: sortedTeams[0].color }}
+                      >
                         {fmt(sortedTeams[0].score)}
                       </div>
                       <div className="text-[9px] text-zinc-500 font-jb mt-0.5">
@@ -805,11 +961,24 @@ export default function SessionPage() {
                     </div>
                   )}
                   {sortedTeams[2] && (
-                    <div className="flex-1 max-w-xs border-2 p-3 text-center" style={{ borderColor: sortedTeams[2].color }}>
-                      <div className="text-xl font-bold font-jb text-zinc-400 dark:text-zinc-500 mb-1">#3</div>
-                      <div className="w-2.5 h-2.5 mx-auto mb-1.5" style={{ background: sortedTeams[2].color }} />
-                      <div className="text-lg font-semibold truncate">{sortedTeams[2].name}</div>
-                      <div className="text-2xl font-bold font-jb tabular-nums mt-1" style={{ color: sortedTeams[2].color }}>
+                    <div
+                      className="flex-1 max-w-xs border-2 p-3 text-center"
+                      style={{ borderColor: sortedTeams[2].color }}
+                    >
+                      <div className="text-xl font-bold font-jb text-zinc-400 dark:text-zinc-500 mb-1">
+                        #3
+                      </div>
+                      <div
+                        className="w-2.5 h-2.5 mx-auto mb-1.5"
+                        style={{ background: sortedTeams[2].color }}
+                      />
+                      <div className="text-lg font-semibold truncate">
+                        {sortedTeams[2].name}
+                      </div>
+                      <div
+                        className="text-2xl font-bold font-jb tabular-nums mt-1"
+                        style={{ color: sortedTeams[2].color }}
+                      >
                         {fmt(sortedTeams[2].score)}
                       </div>
                       <div className="text-[9px] text-zinc-500 font-jb mt-0.5">
@@ -822,11 +991,21 @@ export default function SessionPage() {
                 {sortedTeams.length > 3 && (
                   <div className="space-y-1 mb-6">
                     {sortedTeams.slice(3).map((tm, i) => (
-                      <div key={tm.id} className="flex items-center gap-3 text-sm font-jb text-zinc-500 py-1.5 border-b border-zinc-200/50 dark:border-zinc-800/50">
+                      <div
+                        key={tm.id}
+                        className="flex items-center gap-3 text-sm font-jb text-zinc-500 py-1.5 border-b border-zinc-200/50 dark:border-zinc-800/50"
+                      >
                         <span className="w-5 tabular-nums">#{i + 4}</span>
-                        <span className="w-2 h-2" style={{ background: tm.color }} />
-                        <span className="flex-1 truncate text-zinc-700 dark:text-zinc-300">{tm.name}</span>
-                        <span className="text-[10px] text-zinc-400">{STRATEGIES[classifyStrategy(tm.cfg)].short}</span>
+                        <span
+                          className="w-2 h-2"
+                          style={{ background: tm.color }}
+                        />
+                        <span className="flex-1 truncate text-zinc-700 dark:text-zinc-300">
+                          {tm.name}
+                        </span>
+                        <span className="text-[10px] text-zinc-400">
+                          {STRATEGIES[classifyStrategy(tm.cfg)].short}
+                        </span>
                         <span className="tabular-nums">{fmt(tm.score)}</span>
                       </div>
                     ))}
@@ -841,28 +1020,43 @@ export default function SessionPage() {
                 {champion && champion.score > 0 && (
                   <div
                     className="mb-5 border-2 p-5 lg:p-6 relative overflow-hidden"
-                    style={{ borderColor: champion.color, background: `linear-gradient(90deg, ${champion.color}15, transparent)` }}
+                    style={{
+                      borderColor: champion.color,
+                      background: `linear-gradient(90deg, ${champion.color}15, transparent)`,
+                    }}
                   >
                     <div
                       className="absolute top-2.5 right-2.5 flex items-center gap-1 text-[10px] uppercase tracking-widest font-jb"
                       style={{ color: champion.color }}
                     >
-                      <Crown size={10} /> {t.beamer.currentLeader} · {STRATEGIES[classifyStrategy(champion.cfg)].short}
+                      <Crown size={10} /> {t.beamer.currentLeader} ·{" "}
+                      {STRATEGIES[classifyStrategy(champion.cfg)].short}
                     </div>
                     <div className="flex items-center gap-5 flex-wrap">
-                      <div className="text-6xl lg:text-7xl font-bold font-jb tabular-nums" style={{ color: champion.color }}>
+                      <div
+                        className="text-6xl lg:text-7xl font-bold font-jb tabular-nums"
+                        style={{ color: champion.color }}
+                      >
                         #1
                       </div>
                       <div className="flex-1 min-w-[160px]">
-                        <div className="text-2xl lg:text-3xl font-bold tracking-tight">{champion.name}</div>
+                        <div className="text-2xl lg:text-3xl font-bold tracking-tight">
+                          {champion.name}
+                        </div>
                         <div className="text-xs text-zinc-500 font-jb mt-1">
-                          ${(champion.cost ?? 0).toFixed(0)}/h · {champion.cpu_percent ?? 0}% CPU ·{" "}
+                          ${(champion.cost ?? 0).toFixed(0)}/h ·{" "}
+                          {champion.cpu_percent ?? 0}% CPU ·{" "}
                           {Math.round(champion.throughput ?? 0)} req/s
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-[10px] uppercase tracking-widest text-zinc-500 font-jb">Coins Mined</div>
-                        <div className="text-5xl lg:text-6xl font-bold font-jb tabular-nums" style={{ color: champion.color }}>
+                        <div className="text-[10px] uppercase tracking-widest text-zinc-500 font-jb">
+                          Coins Mined
+                        </div>
+                        <div
+                          className="text-5xl lg:text-6xl font-bold font-jb tabular-nums"
+                          style={{ color: champion.color }}
+                        >
                           {fmt(champion.score)}
                         </div>
                       </div>
@@ -885,54 +1079,93 @@ export default function SessionPage() {
                       >
                         <div
                           className="absolute inset-y-0 left-0 transition-all duration-1000"
-                          style={{ width: `${widthPct}%`, background: `${tm.color}15` }}
+                          style={{
+                            width: `${widthPct}%`,
+                            background: `${tm.color}15`,
+                          }}
                         />
                         <div className="relative flex items-center gap-3 px-4 py-3">
-                          <div className="text-2xl lg:text-3xl font-bold font-jb tabular-nums w-10" style={{ color: tm.color }}>
+                          <div
+                            className="text-2xl lg:text-3xl font-bold font-jb tabular-nums w-10"
+                            style={{ color: tm.color }}
+                          >
                             {i + 1}
                           </div>
-                          <div className="w-1 h-9" style={{ background: tm.color }} />
+                          <div
+                            className="w-1 h-9"
+                            style={{ background: tm.color }}
+                          />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <span className="text-lg font-semibold truncate">{tm.name}</span>
+                              <span className="text-lg font-semibold truncate">
+                                {tm.name}
+                              </span>
                               {showStrategies && (
                                 <span
                                   className="text-[10px] font-jb uppercase tracking-widest px-1 py-0.5 border"
-                                  style={{ color: strategy.color, borderColor: `${strategy.color}60` }}
+                                  style={{
+                                    color: strategy.color,
+                                    borderColor: `${strategy.color}60`,
+                                  }}
                                 >
                                   {strategy.short}
                                 </span>
                               )}
-                              {stale && <WifiOff size={12} className="text-zinc-400 dark:text-zinc-600" />}
+                              {stale && (
+                                <WifiOff
+                                  size={12}
+                                  className="text-zinc-400 dark:text-zinc-600"
+                                />
+                              )}
                               {tm.over_budget && (
-                                <span className="text-[10px] uppercase tracking-widest text-red-500 dark:text-red-400 font-jb">BANKRUPT</span>
+                                <span className="text-[10px] uppercase tracking-widest text-red-500 dark:text-red-400 font-jb">
+                                  BANKRUPT
+                                </span>
                               )}
                               {!tm.over_budget && (tm.dropped ?? 0) > 5 && (
-                                <span className="text-[10px] uppercase tracking-widest text-amber-500 dark:text-amber-400 font-jb">DROPS</span>
+                                <span className="text-[10px] uppercase tracking-widest text-amber-500 dark:text-amber-400 font-jb">
+                                  DROPS
+                                </span>
                               )}
                             </div>
                             <div className="flex items-center gap-3 text-[11px] text-zinc-500 font-jb mt-0.5 flex-wrap">
                               <span>${(tm.cost ?? 0).toFixed(0)}/h</span>
                               <span>{tm.cfg.nodeCount}× node</span>
-                              <span>{tm.cfg.cpuPerNode}c · {tm.cfg.ramPerNode}gb</span>
-                              {tm.cfg.loadBalancer && <span className="text-emerald-500 dark:text-emerald-400">+LB</span>}
-                              {tm.cfg.shards > 1 && <span className="text-violet-500 dark:text-violet-400">{tm.cfg.shards} shards</span>}
+                              <span>
+                                {tm.cfg.cpuPerNode}c · {tm.cfg.ramPerNode}gb
+                              </span>
+                              {tm.cfg.loadBalancer && (
+                                <span className="text-emerald-500 dark:text-emerald-400">
+                                  +LB
+                                </span>
+                              )}
+                              {tm.cfg.shards > 1 && (
+                                <span className="text-violet-500 dark:text-violet-400">
+                                  {tm.cfg.shards} shards
+                                </span>
+                              )}
                             </div>
                           </div>
                           <div className="text-right shrink-0">
                             <div
                               className="text-2xl lg:text-3xl font-bold font-jb tabular-nums"
-                              style={{ color: inTrouble ? "#ef4444" : tm.color }}
+                              style={{
+                                color: inTrouble ? "#ef4444" : tm.color,
+                              }}
                             >
                               {fmt(tm.score)}
                             </div>
                             <div className="text-[10px] text-zinc-500 font-jb">
                               {Math.round(tm.throughput ?? 0)}/s
                               {(tm.dropped ?? 0) > 1 && (
-                                <span className="text-red-500 dark:text-red-400 ml-1">−{Math.round(tm.dropped)}</span>
+                                <span className="text-red-500 dark:text-red-400 ml-1">
+                                  −{Math.round(tm.dropped)}
+                                </span>
                               )}
                             </div>
-                            <div className={`text-[10px] font-jb tabular-nums ${(tm.wallet ?? 100) < 20 ? "text-amber-500 dark:text-amber-400" : "text-zinc-400 dark:text-zinc-600"}`}>
+                            <div
+                              className={`text-[10px] font-jb tabular-nums ${(tm.wallet ?? 100) < 20 ? "text-amber-500 dark:text-amber-400" : "text-zinc-400 dark:text-zinc-600"}`}
+                            >
                               {(tm.wallet ?? 100).toFixed(0)} CHF
                             </div>
                           </div>
@@ -951,8 +1184,12 @@ export default function SessionPage() {
                 {t.beamer.labFooter} · {t.beamer.teams(sortedTeams.length)}
               </span>
               <span>
-                {gameEnded ? "ended" : game.running ? t.beamer.liveStatus : t.beamer.pausedStatus} ·{" "}
-                {t.beamer.scoreFooter}
+                {gameEnded
+                  ? "ended"
+                  : game.running
+                    ? t.beamer.liveStatus
+                    : t.beamer.pausedStatus}{" "}
+                · {t.beamer.scoreFooter}
               </span>
             </footer>
           </section>

@@ -36,11 +36,17 @@ export default function HomePage() {
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <GraduationCap size={22} className="text-amber-500 dark:text-amber-400" />
+              <GraduationCap
+                size={22}
+                className="text-amber-500 dark:text-amber-400"
+              />
               <div>
-                <h2 className="text-base font-semibold">Create Private Session</h2>
+                <h2 className="text-base font-semibold">
+                  Create Private Session
+                </h2>
                 <p className="text-xs text-zinc-500 font-jb mt-0.5">
-                  For teachers — generates a unique join link &amp; QR code for your class.
+                  For teachers — generates a unique join link &amp; QR code for
+                  your class.
                 </p>
               </div>
             </div>
