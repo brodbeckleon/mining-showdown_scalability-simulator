@@ -183,6 +183,13 @@ alter table public.games
 alter table public.games
     add column if not exists game_duration integer not null default 360;
 
+-- Add session code for private sessions (idempotent).
+alter table public.games
+    add column if not exists code varchar(10) unique;
+
+create unique index if not exists games_code_idx
+    on public.games (code) where code is not null;
+
 -- Table-level privileges (required in addition to RLS policies).
 grant select, insert, update, delete on public.games to anon, authenticated;
 grant select, insert, update, delete on public.teams to anon, authenticated;

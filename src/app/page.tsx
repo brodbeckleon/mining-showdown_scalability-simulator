@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Tv, Gamepad2, Users } from "lucide-react";
+import { Tv, Gamepad2, Users, GraduationCap } from "lucide-react";
 import { CONSTANTS } from "@/lib/simulation";
 import { useLang } from "@/lib/lang-context";
 
@@ -28,6 +28,27 @@ export default function HomePage() {
             {t.home.subtitle}
           </p>
         </div>
+
+        {/* Private session */}
+        <Link
+          href="/create"
+          className="group block border border-amber-400/40 dark:border-amber-500/30 bg-amber-50/60 dark:bg-amber-500/5 p-5 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-amber-500/10 transition-all mb-4"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <GraduationCap size={22} className="text-amber-500 dark:text-amber-400" />
+              <div>
+                <h2 className="text-base font-semibold">Create Private Session</h2>
+                <p className="text-xs text-zinc-500 font-jb mt-0.5">
+                  For teachers — generates a unique join link &amp; QR code for your class.
+                </p>
+              </div>
+            </div>
+            <span className="text-[10px] uppercase tracking-widest font-jb text-amber-500 dark:text-amber-400 border border-amber-400/50 px-2 py-0.5 shrink-0">
+              New
+            </span>
+          </div>
+        </Link>
 
         <div className="grid md:grid-cols-3 gap-4">
           <Link
