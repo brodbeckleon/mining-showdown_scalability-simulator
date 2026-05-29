@@ -66,6 +66,7 @@ function fluctuateLoad(base: number): number {
 
 // ─── Share Modal ────────────────────────────────────────────────────────────
 function ShareModal({ code, onClose }: { code: string; onClose: () => void }) {
+  const { t } = useLang();
   const [copied, setCopied] = useState(false);
   const joinUrl = useMemo(
     () =>
@@ -95,10 +96,10 @@ function ShareModal({ code, onClose }: { code: string; onClose: () => void }) {
         </button>
 
         <div className="text-[11px] uppercase tracking-[0.3em] text-amber-500 dark:text-amber-400 font-jb mb-1">
-          Student Join Link
+          {t.session.shareTitle}
         </div>
         <div className="text-xs text-zinc-500 font-jb mb-6">
-          Share this with your students
+          {t.session.shareSubtitle}
         </div>
 
         {/* QR Code */}
@@ -115,7 +116,7 @@ function ShareModal({ code, onClose }: { code: string; onClose: () => void }) {
         {/* Session code */}
         <div className="text-center mb-4">
           <div className="text-[10px] uppercase tracking-widest text-zinc-500 font-jb mb-1">
-            Session Code
+            {t.session.sessionCode}
           </div>
           <div className="text-4xl font-bold font-jb tracking-widest text-zinc-900 dark:text-zinc-100">
             {code}
@@ -126,7 +127,7 @@ function ShareModal({ code, onClose }: { code: string; onClose: () => void }) {
         <div
           className="border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 px-3 py-2.5 text-xs font-jb text-zinc-600 dark:text-zinc-400 mb-4 break-all cursor-pointer hover:border-amber-500 transition-colors"
           onClick={copy}
-          title="Click to copy"
+          title={t.session.clickToCopy}
         >
           {joinUrl}
         </div>
@@ -140,7 +141,7 @@ function ShareModal({ code, onClose }: { code: string; onClose: () => void }) {
           }`}
         >
           {copied ? <Check size={13} /> : <Copy size={13} />}
-          {copied ? "Copied!" : "Copy Link"}
+          {copied ? t.session.copied : t.session.copyLink}
         </button>
       </div>
     </div>
@@ -478,7 +479,7 @@ export default function SessionPage() {
     return (
       <main className="min-h-screen flex items-center justify-center">
         <div className="text-zinc-400 dark:text-zinc-600 font-jb text-sm animate-pulse">
-          Loading session…
+          {t.session.loading}
         </div>
       </main>
     );
@@ -492,13 +493,13 @@ export default function SessionPage() {
             {code}
           </div>
           <div className="text-sm text-zinc-500 font-jb mb-6">
-            Session not found. The code may be invalid or expired.
+            {t.session.notFound}
           </div>
           <Link
             href="/"
             className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 font-jb underline"
           >
-            Back to home
+            {t.session.backToHome}
           </Link>
         </div>
       </main>
@@ -550,7 +551,7 @@ export default function SessionPage() {
           <aside className="xl:w-96 xl:shrink-0 border-r border-zinc-200 dark:border-zinc-800 p-4 space-y-4 xl:overflow-y-auto xl:h-[calc(100vh-49px)] xl:sticky xl:top-[49px]">
             {!isOwner && (
               <div className="border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-[10px] font-jb text-amber-600 dark:text-amber-400">
-                View only — you are not the session owner.
+                {t.session.viewOnly}
               </div>
             )}
 
@@ -575,7 +576,7 @@ export default function SessionPage() {
                         onClick={pauseGame}
                         className="flex items-center gap-1 px-2.5 py-1.5 border border-amber-500/50 hover:bg-amber-500/10 transition-colors text-xs font-jb"
                       >
-                        <Pause size={11} /> Pause
+                        <Pause size={11} /> {t.host.pause}
                       </button>
                     ) : (
                       <button
@@ -583,14 +584,14 @@ export default function SessionPage() {
                         className="flex items-center gap-1 px-2.5 py-1.5 bg-emerald-500 text-white dark:text-zinc-950 hover:bg-emerald-400 transition-colors text-xs font-jb"
                       >
                         <Play size={11} />{" "}
-                        {game.started_at ? "Resume" : "Start"}
+                        {game.started_at ? t.host.resume : t.host.start}
                       </button>
                     )}
                     <button
                       onClick={handleReset}
                       className="flex items-center gap-1 px-2.5 py-1.5 border border-red-500/50 hover:bg-red-500/10 text-red-500 dark:text-red-400 transition-colors text-xs font-jb"
                     >
-                      <RotateCcw size={11} /> Reset
+                      <RotateCcw size={11} /> {t.host.reset}
                     </button>
                   </div>
                 )}
@@ -600,7 +601,7 @@ export default function SessionPage() {
                 <>
                   <div className="mb-3">
                     <Slider
-                      label="Duration"
+                      label={t.host.gameDuration}
                       value={gameDuration}
                       min={60}
                       max={1200}
@@ -634,7 +635,8 @@ export default function SessionPage() {
                     }`}
                   >
                     <Zap size={11} />
-                    {fluctuate ? "Fluctuate ON" : "Fluctuate OFF"} · 1×/s
+                    {fluctuate ? t.host.fluctuateOn : t.host.fluctuateOff} ·
+                    1×/s
                   </button>
 
                   <div className="mt-3 grid grid-cols-3 gap-1.5 text-xs font-jb">
@@ -886,7 +888,7 @@ export default function SessionPage() {
                       className="text-amber-500 dark:text-amber-400"
                     />
                     <span className="text-xs uppercase tracking-[0.4em] text-amber-500 dark:text-amber-400 font-jb">
-                      Final Results
+                      {t.beamer.finalResults}
                     </span>
                     <Trophy
                       size={18}
@@ -1051,7 +1053,7 @@ export default function SessionPage() {
                       </div>
                       <div className="text-right">
                         <div className="text-[10px] uppercase tracking-widest text-zinc-500 font-jb">
-                          Coins Mined
+                          {t.beamer.coinsMined}
                         </div>
                         <div
                           className="text-5xl lg:text-6xl font-bold font-jb tabular-nums"
@@ -1185,7 +1187,7 @@ export default function SessionPage() {
               </span>
               <span>
                 {gameEnded
-                  ? "ended"
+                  ? t.beamer.ended
                   : game.running
                     ? t.beamer.liveStatus
                     : t.beamer.pausedStatus}{" "}

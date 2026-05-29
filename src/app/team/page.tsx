@@ -670,7 +670,7 @@ export default function TeamPage() {
             ) : (
               <section className="border-2 p-5" style={{ borderColor: color }}>
                 <div className="text-[10px] uppercase tracking-widest text-zinc-500 font-jb mb-1">
-                  Coins Mined
+                  {t.team.coinsMined}
                 </div>
                 <div
                   className="text-4xl font-jb tabular-nums"

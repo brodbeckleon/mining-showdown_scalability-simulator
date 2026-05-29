@@ -351,7 +351,7 @@ export default function JoinPage() {
     return (
       <main className="min-h-screen flex items-center justify-center">
         <div className="text-zinc-400 dark:text-zinc-600 font-jb text-sm animate-pulse">
-          Joining session…
+          {t.session.joining}
         </div>
       </main>
     );
@@ -365,13 +365,13 @@ export default function JoinPage() {
             {code}
           </div>
           <div className="text-sm text-zinc-500 font-jb mb-6">
-            Session not found. Check the code or link and try again.
+            {t.session.joinNotFound}
           </div>
           <Link
             href="/"
             className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 font-jb underline"
           >
-            Back to home
+            {t.session.backToHome}
           </Link>
         </div>
       </main>
@@ -724,7 +724,7 @@ export default function JoinPage() {
             ) : (
               <section className="border-2 p-5" style={{ borderColor: color }}>
                 <div className="text-[10px] uppercase tracking-widest text-zinc-500 font-jb mb-1">
-                  Coins Mined
+                  {t.team.coinsMined}
                 </div>
                 <div
                   className="text-4xl font-jb tabular-nums"

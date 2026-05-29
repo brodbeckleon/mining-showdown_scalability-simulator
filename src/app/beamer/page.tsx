@@ -271,7 +271,11 @@ export default function BeamerPage() {
                   {gameEnded ? "0:00" : formatTime(timeLeft)}
                 </div>
                 <div className="text-xs text-zinc-500 font-jb">
-                  {gameEnded ? "beendet" : game.running ? "läuft" : "pausiert"}
+                  {gameEnded
+                    ? t.beamer.ended
+                    : game.running
+                      ? t.beamer.timerRunning
+                      : t.beamer.pausedStatus}
                 </div>
               </div>
             )}
@@ -382,7 +386,7 @@ export default function BeamerPage() {
                   className="text-amber-500 dark:text-amber-400"
                 />
                 <span className="text-xs uppercase tracking-[0.4em] text-amber-500 dark:text-amber-400 font-jb">
-                  Final Results
+                  {t.beamer.finalResults}
                 </span>
                 <Trophy
                   size={20}
@@ -416,7 +420,7 @@ export default function BeamerPage() {
                     {fmt(sorted[1].score)}
                   </div>
                   <div className="text-[10px] text-zinc-500 font-jb mt-1">
-                    coins mined
+                    {t.beamer.coinsMined}
                   </div>
                   <div className="text-[10px] text-zinc-400 dark:text-zinc-600 font-jb mt-0.5">
                     {STRATEGIES[classifyStrategy(sorted[1].cfg)].short}
@@ -457,7 +461,7 @@ export default function BeamerPage() {
                     {fmt(sorted[0].score)}
                   </div>
                   <div className="text-[10px] text-zinc-500 font-jb mt-1">
-                    coins mined
+                    {t.beamer.coinsMined}
                   </div>
                   <div className="text-[10px] text-zinc-400 dark:text-zinc-600 font-jb mt-0.5">
                     {STRATEGIES[classifyStrategy(sorted[0].cfg)].short}
@@ -487,7 +491,7 @@ export default function BeamerPage() {
                     {fmt(sorted[2].score)}
                   </div>
                   <div className="text-[10px] text-zinc-500 font-jb mt-1">
-                    coins mined
+                    {t.beamer.coinsMined}
                   </div>
                   <div className="text-[10px] text-zinc-400 dark:text-zinc-600 font-jb mt-0.5">
                     {STRATEGIES[classifyStrategy(sorted[2].cfg)].short}
@@ -560,7 +564,7 @@ export default function BeamerPage() {
                   </div>
                   <div className="text-right">
                     <div className="text-[11px] uppercase tracking-widest text-zinc-500 font-jb">
-                      Coins Mined
+                      {t.beamer.coinsMined}
                     </div>
                     <div
                       className="text-6xl lg:text-7xl font-bold font-jb tabular-nums"
@@ -699,7 +703,7 @@ export default function BeamerPage() {
           </span>
           <span>
             {gameEnded
-              ? "beendet"
+              ? t.beamer.ended
               : game.running
                 ? t.beamer.liveStatus
                 : t.beamer.pausedStatus}{" "}

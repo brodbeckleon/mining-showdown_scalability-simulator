@@ -416,7 +416,8 @@ export default function HostPage() {
                   onClick={startGame}
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-white dark:text-zinc-950 hover:bg-emerald-400 transition-colors text-xs font-jb"
                 >
-                  <Play size={12} /> {game.started_at ? "Fortsetzen" : "Start"}
+                  <Play size={12} />{" "}
+                  {game.started_at ? t.host.resume : t.host.start}
                 </button>
               )}
               <button
@@ -429,7 +430,7 @@ export default function HostPage() {
           </div>
 
           <Slider
-            label="Spielzeit"
+            label={t.host.gameDuration}
             value={
               game.game_duration ??
               DEFAULT_GAME.game_duration ??
@@ -469,7 +470,8 @@ export default function HostPage() {
               }`}
             >
               <Zap size={12} />
-              {fluctuate ? "Fluctuate AN" : "Fluctuate AUS"} — Spikes 1×/s
+              {fluctuate ? t.host.fluctuateOn : t.host.fluctuateOff} — Spikes
+              1×/s
             </button>
           </div>
 
