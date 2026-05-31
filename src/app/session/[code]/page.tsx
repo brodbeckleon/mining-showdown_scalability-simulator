@@ -11,7 +11,6 @@ import {
   Users,
   Wifi,
   WifiOff,
-  ArrowLeft,
   Trash2,
   Zap,
   Timer,
@@ -27,6 +26,8 @@ import {
 } from "lucide-react";
 import { Slider } from "@/components/Slider";
 import { StrategyPanel } from "@/components/StrategyPanel";
+import { BackButton } from "@/components/BackButton";
+import { ConfirmModal } from "@/components/ConfirmModal";
 import { supabase } from "@/lib/supabase";
 import { fmt, isStale } from "@/lib/colors";
 import { CONSTANTS, computeElapsed } from "@/lib/simulation";
@@ -163,6 +164,7 @@ export default function SessionPage() {
   // UI
   const [showShareModal, setShowShareModal] = useState(false);
   const [showStrategies, setShowStrategies] = useState(false);
+  const [pendingConfirm, setPendingConfirm] = useState<null | { message: string; danger?: boolean; onConfirm: () => void }>(null);
 
   // Game state
   const [game, setGame] = useState<GameRow>(DEFAULT_SESSION_GAME);
@@ -426,30 +428,37 @@ export default function SessionPage() {
     });
   };
 
-  const handleReset = async () => {
+  const handleReset = () => {
     if (!gameId) return;
-    if (
-      !window.confirm(
-        "Reset this session? All teams and scores will be cleared.",
-      )
-    )
-      return;
-    const sb = supabase();
-    await sb.from("teams").delete().eq("game_id", gameId);
-    await sb.from("load_snapshots").delete().eq("game_id", gameId);
-    await sb
-      .from("games")
-      .update({ load: 0, running: false, started_at: null })
-      .eq("id", gameId);
-    setGame((prev) => ({ ...prev, load: 0, running: false, started_at: null }));
-    setTeams([]);
-    setLoadHistory([]);
-    baseLoadRef.current = 0;
+    setPendingConfirm({
+      message: t.host.confirmReset,
+      danger: true,
+      onConfirm: async () => {
+        setPendingConfirm(null);
+        const sb = supabase();
+        await sb.from("teams").delete().eq("game_id", gameId);
+        await sb.from("load_snapshots").delete().eq("game_id", gameId);
+        await sb
+          .from("games")
+          .update({ load: 0, running: false, started_at: null })
+          .eq("id", gameId);
+        setGame((prev) => ({ ...prev, load: 0, running: false, started_at: null }));
+        setTeams([]);
+        setLoadHistory([]);
+        baseLoadRef.current = 0;
+      },
+    });
   };
 
-  const deleteTeam = async (id: string, name: string) => {
-    if (!window.confirm(`Remove team "${name}"?`)) return;
-    await supabase().from("teams").delete().eq("id", id);
+  const deleteTeam = (id: string, name: string) => {
+    setPendingConfirm({
+      message: t.host.confirmDeleteTeam(name),
+      danger: true,
+      onConfirm: async () => {
+        setPendingConfirm(null);
+        await supabase().from("teams").delete().eq("id", id);
+      },
+    });
   };
 
   // ─── Derived values ───────────────────────────────────────────────────
@@ -511,16 +520,19 @@ export default function SessionPage() {
       {showShareModal && (
         <ShareModal code={code} onClose={() => setShowShareModal(false)} />
       )}
+      {pendingConfirm && (
+        <ConfirmModal
+          message={pendingConfirm.message}
+          danger={pendingConfirm.danger}
+          onConfirm={pendingConfirm.onConfirm}
+          onCancel={() => setPendingConfirm(null)}
+        />
+      )}
 
       <main className="min-h-screen flex flex-col">
         {/* ─── Top bar ─────────────────────────────────────────────── */}
         <header className="flex items-center gap-3 px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 sticky top-0 z-20">
-          <Link
-            href="/"
-            className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 font-jb shrink-0"
-          >
-            <ArrowLeft size={12} />
-          </Link>
+          <BackButton className="shrink-0" />
 
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <span className="text-[10px] uppercase tracking-[0.3em] text-zinc-500 font-jb hidden sm:block">

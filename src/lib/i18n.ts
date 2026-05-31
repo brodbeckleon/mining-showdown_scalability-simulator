@@ -9,6 +9,8 @@ export const translations = {
     common: {
       back: "zurück",
       leave: "verlassen",
+      confirm: "Bestätigen",
+      cancel: "Abbrechen",
     },
     home: {
       tagline: "ASE2 — Scalability Multiplayer",
@@ -147,6 +149,8 @@ export const translations = {
     common: {
       back: "back",
       leave: "leave",
+      confirm: "Confirm",
+      cancel: "Cancel",
     },
     home: {
       tagline: "ASE2 — Scalability Multiplayer",

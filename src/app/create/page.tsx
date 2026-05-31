@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { ArrowLeft, Plus, Timer, Users } from "lucide-react";
+import { Plus, Timer, Users } from "lucide-react";
+import { BackButton } from "@/components/BackButton";
 import { Slider } from "@/components/Slider";
 import { supabase } from "@/lib/supabase";
 import { generateSessionCode } from "@/lib/session-codes";
@@ -51,12 +51,7 @@ export default function CreatePage() {
   return (
     <main className="min-h-screen flex items-center justify-center p-6">
       <div className="w-full max-w-md">
-        <Link
-          href="/"
-          className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 font-jb mb-6"
-        >
-          <ArrowLeft size={12} /> Back
-        </Link>
+        <BackButton className="mb-6" />
 
         <div className="flex items-center gap-2 mb-1">
           <Timer size={14} className="text-amber-500 dark:text-amber-400" />

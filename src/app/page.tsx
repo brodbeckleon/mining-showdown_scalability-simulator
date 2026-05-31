@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Tv, Gamepad2, Users, GraduationCap } from "lucide-react";
+import { GraduationCap } from "lucide-react";
 import { CONSTANTS } from "@/lib/simulation";
 import { useLang } from "@/lib/lang-context";
 
@@ -9,7 +9,7 @@ export default function HomePage() {
   const { t } = useLang();
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-6">
+    <main className="min-h-screen flex flex-col items-center justify-center p-6 gap-8">
       <div className="max-w-3xl w-full">
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-2 mb-3">
@@ -50,55 +50,8 @@ export default function HomePage() {
                 </p>
               </div>
             </div>
-            <span className="text-[10px] uppercase tracking-widest font-jb text-amber-500 dark:text-amber-400 border border-amber-400/50 px-2 py-0.5 shrink-0">
-              New
-            </span>
           </div>
         </Link>
-
-        <div className="grid md:grid-cols-3 gap-4">
-          <Link
-            href="/beamer"
-            className="group border border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-900/30 p-6 hover:border-emerald-500 transition-all"
-          >
-            <Tv
-              size={28}
-              className="text-emerald-500 dark:text-emerald-400 mb-4"
-            />
-            <h2 className="text-lg font-semibold mb-1.5">Beamer</h2>
-            <p className="text-xs text-zinc-500 leading-relaxed font-jb">
-              {t.home.beamerDesc}
-            </p>
-          </Link>
-
-          <Link
-            href="/team"
-            className="group border border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-900/30 p-6 hover:border-emerald-500 transition-all"
-          >
-            <Gamepad2
-              size={28}
-              className="text-emerald-500 dark:text-emerald-400 mb-4"
-            />
-            <h2 className="text-lg font-semibold mb-1.5">{t.home.teamTitle}</h2>
-            <p className="text-xs text-zinc-500 leading-relaxed font-jb">
-              {t.home.teamDesc}
-            </p>
-          </Link>
-
-          <Link
-            href="/host"
-            className="group border border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-900/30 p-6 hover:border-amber-500 transition-all"
-          >
-            <Users
-              size={28}
-              className="text-amber-500 dark:text-amber-400 mb-4"
-            />
-            <h2 className="text-lg font-semibold mb-1.5">Host</h2>
-            <p className="text-xs text-zinc-500 leading-relaxed font-jb">
-              {t.home.hostDesc}
-            </p>
-          </Link>
-        </div>
 
         <div className="mt-10 border border-zinc-200 dark:border-zinc-800 bg-zinc-100/30 dark:bg-zinc-900/20 p-4">
           <h3 className="text-[10px] uppercase tracking-widest text-zinc-500 font-jb mb-2">
@@ -128,6 +81,17 @@ export default function HomePage() {
           </ol>
         </div>
       </div>
+
+      <footer className="text-center">
+        <a
+          href="https://github.com/brodbeckleon/mining-showdown_scalability-simulator"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[10px] text-zinc-400 dark:text-zinc-600 hover:text-zinc-600 dark:hover:text-zinc-400 font-jb transition-colors"
+        >
+          github.com/brodbeckleon/mining-showdown_scalability-simulator
+        </a>
+      </footer>
     </main>
   );
 }

@@ -4,11 +4,15 @@
 > Teams compete to build the most efficient mining infrastructure under load — vertical scaling,
 > load balancing, sharding. Live leaderboard for the projector, interactive topology view per team.
 
+**GitHub:** [github.com/brodbeckleon/mining-showdown_scalability-simulator](https://github.com/brodbeckleon/mining-showdown_scalability-simulator)
+
 ---
 
 ## Overview
 
 Mining Showdown is a real-time multiplayer game designed to teach distributed systems scaling concepts through competition. Each team configures a 3-tier infrastructure (App Nodes → Load Balancer → DB Shards) to process incoming requests as efficiently as possible. The host controls the global request load in real-time, forcing teams to adapt. The team with the highest cumulative score when the game ends wins.
+
+The app uses a **private session** model: the teacher creates a session and receives a unique join link and QR code to share with students. No shared global game state.
 
 ---
 
@@ -43,7 +47,6 @@ Copy `.env.local.example` to `.env.local` and fill in your values:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://<your-project>.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
-NEXT_PUBLIC_HOST_PASSWORD=<your-host-password>
 ```
 
 ### Run
@@ -57,14 +60,24 @@ npm run typecheck # Type check without emitting
 
 ---
 
+## Session Flow
+
+1. **Teacher** opens `/create`, sets the game duration, and clicks **Create Session**.
+2. The app generates a unique session code and redirects to `/session/[code]` — the host console with a built-in beamer view and shareable QR code.
+3. **Students** open `/join/[code]` (via QR code or direct link), enter a team name, and start playing.
+4. The teacher starts the game, adjusts the load over time, and can toggle **Fluctuate** for realistic spikes.
+5. When time runs out the game stops automatically. The host view shows a final podium; students see a game-over overlay with their placement.
+
+---
+
 ## Pages
 
-| Route     | Audience    | Description                                                                      |
-| --------- | ----------- | -------------------------------------------------------------------------------- |
-| `/`       | Everyone    | Landing page with game explanation and links                                     |
-| `/team`   | Players     | Join a team, configure infrastructure, monitor live score and wallet             |
-| `/beamer` | Projector   | Live leaderboard with strategy classification overlay (press `S`)                |
-| `/host`   | Game master | Password-protected console to start/pause/reset the game and control global load |
+| Route              | Audience    | Description                                                               |
+| ------------------ | ----------- | ------------------------------------------------------------------------- |
+| `/`                | Everyone    | Landing page — create a private session or read the game rules            |
+| `/create`          | Teacher     | Configure game duration and create a new session                          |
+| `/session/[code]`  | Teacher     | Host console + live leaderboard. Password-free; only the creator has controls |
+| `/join/[code]`     | Students    | Join a session, configure infrastructure, monitor live score and wallet   |
 
 ---
 
@@ -88,7 +101,7 @@ Each team configures three scaling dimensions:
 
 ### Economy
 
-Teams start with **80 Coins**. Every second:
+Teams start with **80 CHF**. Every second:
 
 ```
 wallet += (throughput × EARN_RATE) - (infra_cost × SPEND_RATE)
@@ -149,33 +162,33 @@ dropped    = load - throughput
 
 ### Timer & Game Duration
 
-The host sets the game duration via a slider (60–1200 s, default **360 s / 6 min**) before starting.
-Once the game is running the slider is locked. A countdown is visible on both the Host Console and the Beamer.
+The teacher sets the game duration via a slider (60–1200 s, default **360 s / 6 min**) before starting.
+Once the game is running the slider is locked. A countdown is visible on both the host console and the leaderboard.
 
 The timer supports **pause/resume**: elapsed seconds are encoded into `started_at` as a Unix-epoch offset so the state survives page reloads.
 
-When time runs out the game stops automatically and teams see a **Game Over overlay** with their final score and placement. The Beamer switches to a **Final Results** view.
+When time runs out the game stops automatically and teams see a **Game Over overlay** with their final score and placement. The host view switches to a **Final Results** podium.
 
-### Host Load Controls
+### Load Controls
 
 | Control              | Description                                                                                                          |
 | -------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | Load Slider          | Sets global req/s (0–3000, step 50 by default)                                                                       |
 | **Fluctuate** toggle | Randomizes load every second: spikes (1.8×–3×), dips (30–60%), or ±25% noise. Only active while the game is running. |
 
-### Host Load Phases (preset buttons)
+### Load Phases (preset buttons)
 
-| Phase   | Load       | Label  |
-| ------- | ---------- | ------ |
-| Phase 1 | 200 req/s  | easy   |
-| Phase 2 | 800 req/s  | brutal |
-| Phase 3 | 1800 req/s | chaos  |
+| Phase   | Load       |
+| ------- | ---------- |
+| Phase 1 | 200 req/s  |
+| Phase 2 | 800 req/s  |
+| Phase 3 | 1800 req/s |
 
 ---
 
 ## Scaling Strategies
 
-Teams are automatically classified into one of six strategies (shown on the Beamer):
+Teams are automatically classified into one of six strategies (shown on the leaderboard overlay):
 
 | Strategy          | Description                                    |
 | ----------------- | ---------------------------------------------- |
@@ -192,19 +205,20 @@ Classification logic is in `src/lib/strategies.ts`.
 
 ## Supabase Schema
 
-Two tables are required:
+Three tables are required:
 
 **`games`**
 
 ```sql
 id            uuid primary key
+code          text unique          -- short session code (e.g. "ALPHA7")
 load          integer
 running       boolean
 started_at    timestamptz
 created_at    timestamptz
-game_duration integer          -- optional, seconds (default 360)
-max_load      integer          -- optional, slider max (default 3000)
-load_step     integer          -- optional, slider step (default 50)
+game_duration integer              -- seconds (default 360)
+max_load      integer              -- slider max (default 3000)
+load_step     integer              -- slider step (default 50)
 ```
 
 **`teams`**
@@ -238,9 +252,9 @@ load         integer
 recorded_at  timestamptz default now()
 ```
 
-Used by the Beamer to render the live load history graph (last 120 data points).
+Used by the leaderboard to render the live load history graph (last 120 data points).
 
-Enable Realtime on `games` and `teams` in the Supabase dashboard (`load_snapshots` is polled on initial load only).
+Enable Realtime on `games`, `teams`, and `load_snapshots` in the Supabase dashboard.
 
 ---
 
@@ -249,24 +263,30 @@ Enable Realtime on `games` and `teams` in the Supabase dashboard (`load_snapshot
 ```
 src/
 ├── app/
-│   ├── page.tsx          # Landing page
-│   ├── team/page.tsx     # Team player view
-│   ├── host/page.tsx     # Host console
-│   └── beamer/page.tsx   # Projector leaderboard
+│   ├── page.tsx               # Landing page
+│   ├── create/page.tsx        # Create new private session
+│   ├── session/[code]/        # Host console + live leaderboard
+│   ├── join/[code]/           # Student team view
+│   └── not-found.tsx          # 404 page
 ├── components/
-│   ├── ArchitectureViz   # Live topology diagram
-│   ├── Bar               # Utilization bar component
-│   ├── Slider            # Config slider
-│   ├── Toggle            # Boolean toggle
-│   ├── StrategyPanel     # Strategy classification overlay
-│   └── LangToggle        # DE/EN language switcher
+│   ├── ArchitectureViz        # Live topology diagram
+│   ├── BackButton             # Unified back-to-home link
+│   ├── Bar                    # Utilization bar component
+│   ├── ConfirmModal           # Custom confirmation dialog
+│   ├── LangToggle             # DE/EN switcher + dark/light toggle
+│   ├── Slider                 # Config slider
+│   ├── StrategyPanel          # Strategy classification overlay
+│   └── Toggle                 # Boolean toggle
 └── lib/
-    ├── simulation.ts     # Core M/M/1 simulation model
-    ├── strategies.ts     # Strategy classification logic
-    ├── defaults.ts       # Default game and team config
-    ├── supabase.ts       # Supabase client setup
-    ├── types.ts          # Shared TypeScript types
-    └── i18n.ts           # DE/EN translations
+    ├── simulation.ts          # Core M/M/1 simulation model
+    ├── strategies.ts          # Strategy classification logic
+    ├── session-codes.ts       # Unique session code generator
+    ├── defaults.ts            # Default game and team config
+    ├── supabase.ts            # Supabase client setup
+    ├── types.ts               # Shared TypeScript types
+    ├── i18n.ts                # DE/EN translations
+    ├── lang-context.tsx       # Language context provider
+    └── theme-context.tsx      # Dark/light theme provider
 ```
 
 ---

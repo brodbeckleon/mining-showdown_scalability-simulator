@@ -9,13 +9,13 @@ import {
   Database,
   Network,
   TrendingUp,
-  ArrowLeft,
   CheckCircle2,
   AlertTriangle,
   Trophy,
   Server,
   Coins,
 } from "lucide-react";
+import { BackButton } from "@/components/BackButton";
 import { Slider } from "@/components/Slider";
 import { Toggle } from "@/components/Toggle";
 import { Bar } from "@/components/Bar";
@@ -383,12 +383,7 @@ export default function JoinPage() {
     return (
       <main className="min-h-screen flex items-center justify-center p-6">
         <div className="w-full max-w-md">
-          <Link
-            href="/"
-            className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 font-jb mb-6"
-          >
-            <ArrowLeft size={12} /> {t.common.back}
-          </Link>
+          <BackButton className="mb-6" />
 
           <div className="flex items-center gap-2 mb-1">
             <span className="text-[10px] uppercase tracking-[0.3em] text-amber-500 dark:text-amber-400 font-jb">
