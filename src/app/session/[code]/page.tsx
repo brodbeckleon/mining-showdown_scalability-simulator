@@ -164,7 +164,11 @@ export default function SessionPage() {
   // UI
   const [showShareModal, setShowShareModal] = useState(false);
   const [showStrategies, setShowStrategies] = useState(false);
-  const [pendingConfirm, setPendingConfirm] = useState<null | { message: string; danger?: boolean; onConfirm: () => void }>(null);
+  const [pendingConfirm, setPendingConfirm] = useState<null | {
+    message: string;
+    danger?: boolean;
+    onConfirm: () => void;
+  }>(null);
 
   // Game state
   const [game, setGame] = useState<GameRow>(DEFAULT_SESSION_GAME);
@@ -442,7 +446,12 @@ export default function SessionPage() {
           .from("games")
           .update({ load: 0, running: false, started_at: null })
           .eq("id", gameId);
-        setGame((prev) => ({ ...prev, load: 0, running: false, started_at: null }));
+        setGame((prev) => ({
+          ...prev,
+          load: 0,
+          running: false,
+          started_at: null,
+        }));
         setTeams([]);
         setLoadHistory([]);
         baseLoadRef.current = 0;

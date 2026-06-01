@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { GraduationCap } from "lucide-react";
+import { GraduationCap, LogIn } from "lucide-react";
 import { CONSTANTS } from "@/lib/simulation";
 import { useLang } from "@/lib/lang-context";
 
@@ -47,6 +47,27 @@ export default function HomePage() {
                 <p className="text-xs text-zinc-500 font-jb mt-0.5">
                   For teachers — generates a unique join link &amp; QR code for
                   your class.
+                </p>
+              </div>
+            </div>
+          </div>
+        </Link>
+
+        {/* Join session */}
+        <Link
+          href="/join"
+          className="group block border border-emerald-400/40 dark:border-emerald-500/30 bg-emerald-50/60 dark:bg-emerald-500/5 p-5 hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-all mb-4"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <LogIn
+                size={22}
+                className="text-emerald-500 dark:text-emerald-400"
+              />
+              <div>
+                <h2 className="text-base font-semibold">{t.home.joinButton}</h2>
+                <p className="text-xs text-zinc-500 font-jb mt-0.5">
+                  {t.home.joinDesc}
                 </p>
               </div>
             </div>

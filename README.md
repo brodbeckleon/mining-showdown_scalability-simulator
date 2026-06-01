@@ -72,12 +72,12 @@ npm run typecheck # Type check without emitting
 
 ## Pages
 
-| Route              | Audience    | Description                                                               |
-| ------------------ | ----------- | ------------------------------------------------------------------------- |
-| `/`                | Everyone    | Landing page — create a private session or read the game rules            |
-| `/create`          | Teacher     | Configure game duration and create a new session                          |
-| `/session/[code]`  | Teacher     | Host console + live leaderboard. Password-free; only the creator has controls |
-| `/join/[code]`     | Students    | Join a session, configure infrastructure, monitor live score and wallet   |
+| Route             | Audience | Description                                                                   |
+| ----------------- | -------- | ----------------------------------------------------------------------------- |
+| `/`               | Everyone | Landing page — create a private session or read the game rules                |
+| `/create`         | Teacher  | Configure game duration and create a new session                              |
+| `/session/[code]` | Teacher  | Host console + live leaderboard. Password-free; only the creator has controls |
+| `/join/[code]`    | Students | Join a session, configure infrastructure, monitor live score and wallet       |
 
 ---
 

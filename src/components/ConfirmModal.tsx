@@ -9,7 +9,12 @@ interface ConfirmModalProps {
   danger?: boolean;
 }
 
-export function ConfirmModal({ message, onConfirm, onCancel, danger = false }: ConfirmModalProps) {
+export function ConfirmModal({
+  message,
+  onConfirm,
+  onCancel,
+  danger = false,
+}: ConfirmModalProps) {
   const { t } = useLang();
   return (
     <div

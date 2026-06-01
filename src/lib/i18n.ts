@@ -30,6 +30,15 @@ export const translations = {
         `Teams starten mit ${budget} CHF Wallet. Infrastrukturkosten laufen laufend ab. Wer bankrott geht, ist raus.`,
       step5:
         "Coins = kumuliert geminte Coins (Throughput × Mining-Rate). Drops = weniger Coins.",
+      joinButton: "Session beitreten",
+      joinDesc: "Tritt einer bestehenden Session mit Code bei.",
+    },
+    joinPage: {
+      title: "Session beitreten",
+      subtitle: "Gib den Code ein, den du vom Host erhalten hast.",
+      codeLabel: "Session Code",
+      codePlaceholder: "z.B. ABC123",
+      joinButton: "Beitreten →",
     },
     beamer: {
       live: "LIVE — MINING IN PROGRESS",
@@ -168,6 +177,15 @@ export const translations = {
         `Teams start with a ${budget} CHF wallet. Infrastructure costs drain it continuously. Go bankrupt and you're out.`,
       step5:
         "Coins = cumulative mined coins (throughput × mining rate). Drops = fewer coins.",
+      joinButton: "Join Session",
+      joinDesc: "Join an existing session with a code.",
+    },
+    joinPage: {
+      title: "Join Session",
+      subtitle: "Enter the code you received from the host.",
+      codeLabel: "Session Code",
+      codePlaceholder: "e.g. ABC123",
+      joinButton: "Join →",
     },
     beamer: {
       live: "LIVE — MINING IN PROGRESS",

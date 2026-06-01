@@ -13,7 +13,9 @@ export default function NotFound() {
         </h1>
         <p className="text-sm text-zinc-500 dark:text-zinc-400 font-jb mb-8 max-w-xs mx-auto leading-relaxed">
           This page has been replaced by the new session system. Use{" "}
-          <span className="text-amber-500 dark:text-amber-400">Create Session</span>{" "}
+          <span className="text-amber-500 dark:text-amber-400">
+            Create Session
+          </span>{" "}
           on the home page to get started.
         </p>
         <BackButton className="justify-center" />
