@@ -1,6 +1,11 @@
 "use client";
 
-import { createContext, useContext, useSyncExternalStore } from "react";
+import {
+  createContext,
+  useContext,
+  useSyncExternalStore,
+  useEffect,
+} from "react";
 import type { Lang, Translations } from "./i18n";
 import { translations } from "./i18n";
 
@@ -37,6 +42,10 @@ function setStoredLang(lang: Lang) {
 
 export function LangProvider({ children }: { children: React.ReactNode }) {
   const lang = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
 
   return (
     <LangContext.Provider
