@@ -56,13 +56,13 @@ export default function CreatePageClient() {
         <div className="flex items-center gap-2 mb-1">
           <Timer size={14} className="text-amber-500 dark:text-amber-400" />
           <span className="text-[11px] uppercase tracking-[0.3em] text-amber-500 dark:text-amber-400 font-jb">
-            Private Session
+            Multiplayer
           </span>
         </div>
-        <h1 className="text-2xl font-semibold mb-1">Create Session</h1>
+        <h1 className="text-2xl font-semibold mb-1">Host a Game</h1>
         <p className="text-xs text-zinc-500 font-jb mb-8">
-          Create a private game session for your class. After creation you get a
-          shareable join link for students.
+          Create a private session and invite others with a unique join link and
+          QR code.
         </p>
 
         <div className="border border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-900/30 p-5 mb-5">
@@ -82,7 +82,7 @@ export default function CreatePageClient() {
           <div className="flex items-center gap-2">
             <Users size={11} className="text-amber-500 dark:text-amber-400" />
             <span>
-              Students join at{" "}
+              Players join at{" "}
               <span className="text-zinc-700 dark:text-zinc-300">
                 /join/[code]
               </span>

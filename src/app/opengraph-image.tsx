@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "Mining Showdown — ASE2 Scalability Lab";
+export const alt = "Mining Showdown — Scalability Simulation";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -58,7 +58,7 @@ export default function OgImage() {
             textTransform: "uppercase",
           }}
         >
-          ASE2 — Scalability Multiplayer
+          Scalability Simulation
         </span>
       </div>
 

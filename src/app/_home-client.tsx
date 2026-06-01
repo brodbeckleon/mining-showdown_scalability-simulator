@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { GraduationCap, LogIn } from "lucide-react";
+import { GraduationCap, LogIn, Gamepad2 } from "lucide-react";
 import { CONSTANTS } from "@/lib/simulation";
 import { useLang } from "@/lib/lang-context";
 
@@ -29,7 +29,33 @@ export default function HomePageClient() {
           </p>
         </div>
 
-        {/* Private session */}
+        {/* Solo mode */}
+        <Link
+          href="/solo"
+          className="group block border border-emerald-400/40 dark:border-emerald-500/30 bg-emerald-50/60 dark:bg-emerald-500/5 p-5 hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-all mb-4"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Gamepad2
+                size={22}
+                className="text-emerald-500 dark:text-emerald-400"
+              />
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-base font-semibold">{t.home.soloButton}</h2>
+                  <span className="text-[10px] uppercase tracking-widest font-jb px-1.5 py-0.5 border border-emerald-500/50 text-emerald-500 dark:text-emerald-400">
+                    Beta
+                  </span>
+                </div>
+                <p className="text-xs text-zinc-500 font-jb mt-0.5">
+                  {t.home.soloDesc}
+                </p>
+              </div>
+            </div>
+          </div>
+        </Link>
+
+        {/* Host session */}
         <Link
           href="/create"
           className="group block border border-amber-400/40 dark:border-amber-500/30 bg-amber-50/60 dark:bg-amber-500/5 p-5 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-amber-500/10 transition-all mb-4"
@@ -41,12 +67,9 @@ export default function HomePageClient() {
                 className="text-amber-500 dark:text-amber-400"
               />
               <div>
-                <h2 className="text-base font-semibold">
-                  Create Private Session
-                </h2>
+                <h2 className="text-base font-semibold">{t.home.hostButton}</h2>
                 <p className="text-xs text-zinc-500 font-jb mt-0.5">
-                  For teachers — generates a unique join link &amp; QR code for
-                  your class.
+                  {t.home.hostDesc}
                 </p>
               </div>
             </div>
@@ -56,13 +79,13 @@ export default function HomePageClient() {
         {/* Join session */}
         <Link
           href="/join"
-          className="group block border border-emerald-400/40 dark:border-emerald-500/30 bg-emerald-50/60 dark:bg-emerald-500/5 p-5 hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-all mb-4"
+          className="group block border border-zinc-200 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-900/20 p-5 hover:border-zinc-400 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-900/40 transition-all mb-4"
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <LogIn
                 size={22}
-                className="text-emerald-500 dark:text-emerald-400"
+                className="text-zinc-500 dark:text-zinc-400"
               />
               <div>
                 <h2 className="text-base font-semibold">{t.home.joinButton}</h2>

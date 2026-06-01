@@ -25,11 +25,11 @@ const BASE_URL =
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: "Mining Showdown — ASE2 Scalability Lab",
+    default: "Mining Showdown",
     template: "%s | Mining Showdown",
   },
   description:
-    "Multiplayer mining-farm scaling competition. Demonstrates vertical scaling, load balancing, and database sharding under load. Built for the ZHAW ASE2 Scalability Lab.",
+    "Multiplayer and single-player mining-farm scaling competition. Build the most efficient infrastructure under load — vertical scaling, load balancing, and database sharding.",
   keywords: [
     "mining",
     "scalability",
@@ -38,10 +38,9 @@ export const metadata: Metadata = {
     "vertical scaling",
     "horizontal scaling",
     "multiplayer",
-    "ASE2",
-    "ZHAW",
-    "education",
-    "software engineering",
+    "single player",
+    "simulation",
+    "infrastructure",
   ],
   authors: [{ name: "Léon Brodbeck", url: "https://github.com/brodbeckleon" }],
   creator: "Léon Brodbeck",
@@ -49,9 +48,9 @@ export const metadata: Metadata = {
     type: "website",
     locale: "de_CH",
     alternateLocale: ["en_US"],
-    title: "Mining Showdown — ASE2 Scalability Lab",
+    title: "Mining Showdown",
     description:
-      "Who builds the most efficient mining infrastructure under load? Multiplayer scalability competition for students.",
+      "Who builds the most efficient mining infrastructure under load? Multiplayer and solo scalability simulation.",
     siteName: "Mining Showdown",
     url: BASE_URL,
     images: [
@@ -65,9 +64,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Mining Showdown — ASE2 Scalability Lab",
+    title: "Mining Showdown",
     description:
-      "Multiplayer mining-farm scaling competition. Vertical scaling, load balancing, and DB sharding under live load.",
+      "Multiplayer and solo mining-farm scaling competition. Vertical scaling, load balancing, and DB sharding under live load.",
     images: ["/opengraph-image"],
   },
   robots: {

@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Skalierungsstrategien aus der ASE2-Arbeit
+// Skalierungsstrategien (nach Bondi & Software Engineering at Google)
 // ─────────────────────────────────────────────────────────────────────────────
 
 import type { TeamConfig, StrategyKey } from "./types";

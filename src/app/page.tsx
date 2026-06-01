@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import HomePageClient from "./_home-client";
 
 export const metadata: Metadata = {
-  title: "Mining Showdown — ASE2 Scalability Lab",
+  title: "Mining Showdown",
   description:
-    "Multiplayer mining-farm scaling competition. Demonstrates vertical scaling, load balancing, and database sharding under load. Built for the ZHAW ASE2 Scalability Lab.",
+    "Multiplayer and single-player mining-farm scaling competition. Build the most efficient infrastructure under load — vertical scaling, load balancing, and database sharding.",
   alternates: {
     canonical: "/",
   },
@@ -15,8 +15,8 @@ const jsonLd = {
   "@type": "WebApplication",
   name: "Mining Showdown",
   description:
-    "Multiplayer mining-farm scaling competition that demonstrates vertical scaling, load balancing, and database sharding under load.",
-  applicationCategory: "EducationalApplication",
+    "Multiplayer and single-player mining-farm scaling simulation. Compete to build the most efficient infrastructure under live load — vertical scaling, load balancing, and database sharding.",
+  applicationCategory: "GameApplication",
   operatingSystem: "Web",
   url: process.env.NEXT_PUBLIC_BASE_URL ?? "https://mining-showdown.vercel.app",
   author: {
@@ -24,13 +24,8 @@ const jsonLd = {
     name: "Léon Brodbeck",
     url: "https://github.com/brodbeckleon",
   },
-  educationalUse: "Assignment",
-  audience: {
-    "@type": "EducationalAudience",
-    educationalRole: "Student",
-  },
   keywords:
-    "scalability, load balancing, database sharding, vertical scaling, horizontal scaling, multiplayer, education",
+    "scalability, load balancing, database sharding, vertical scaling, horizontal scaling, multiplayer, single player, simulation",
 };
 
 export default function HomePage() {

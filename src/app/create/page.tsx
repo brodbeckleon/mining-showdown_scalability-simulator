@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import CreatePageClient from "./_create-client";
 
 export const metadata: Metadata = {
-  title: "Create Session",
+  title: "Host a Game",
   description:
-    "Create a private Mining Showdown game session for your class. Generates a unique join link and QR code for students.",
+    "Create a private Mining Showdown multiplayer session and invite others with a unique join link and QR code.",
   alternates: {
     canonical: "/create",
   },
